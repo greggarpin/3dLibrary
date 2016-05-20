@@ -90,3 +90,28 @@ int RenderContext::getHeight() const
     return height;
 }
 
+void RenderContext::applyProjectionMatrix()
+{
+    GLint projectionUniform = glGetUniformLocation(programHandle, "Projection");
+
+    glUniformMatrix4fv(projectionUniform, 1, 0, projectionMatrix.getPointer());
+}
+
+Vertex RenderContext::UnProject(float screenX, float screenY, float screenZ) const
+{
+    Vertex outVec;
+    Matrix modelViewProj;
+    Matrix inv;
+    bool hasInverse = false;
+
+    modelViewProj.set(modelviewMatrix);
+    modelViewProj.multiply(projectionMatrix);
+    hasInverse = modelViewProj.getInverse(inv);
+
+    
+    outVec.setPosition(screenX * inv.get(0,0) + screenY * inv.get(0, 1) + screenZ * inv.get(0, 2) + inv.get(0, 3),
+                       screenX * inv.get(1,0) + screenY * inv.get(1, 1) + screenZ * inv.get(1, 2) + inv.get(1, 3),
+                       screenX * inv.get(2,0) + screenY * inv.get(2, 1) + screenZ * inv.get(2, 2) + inv.get(2, 3));
+
+    return outVec;
+}

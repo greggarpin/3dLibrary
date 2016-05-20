@@ -114,6 +114,7 @@ public:
     void onTouchStart(int x, int y);
     void onTouchMoved(int x, int y);
     void onTouchEnd(int x, int y);
+    void onTap();
 
 private:
     GLuint BuildShader(const char *source, GLenum shaderType) const;
@@ -121,6 +122,8 @@ private:
     void ApplyOrtho(float maxX, float maxY) const;
     void ApplyPerspective(float near, float far, float left, float right, float top, float bottom);
     void ApplyRotation() const;
+    Vertex GetViewDirection() const;
+    void GetWorldCoordFromScreenCoord(int screenX, int screenY, float worldHeight) const;
     GLuint m_framebuffer;
     GLuint m_renderbuffer;
     ShaderProgram normalProgram, selectionProgram;
@@ -128,6 +131,7 @@ private:
     float roll, pitch, yaw;
     bool useRollPitchYaw;
     int touchX, touchY;
+    int numTouchMoves;
     bool touchStarted;
     float cameraPosition[3];
 
@@ -156,6 +160,7 @@ RenderingEngine2::RenderingEngine2()
     xRot = yRot = zRot = 0;
     roll = pitch = yaw = 0;
     touchStarted = false;
+    numTouchMoves = 0;
     useRollPitchYaw = true;
 
     cameraPosition[0] = 0;
@@ -188,10 +193,9 @@ void RenderingEngine2::Initialize(int width, int height)
     ApplyPerspective(-1, 10, -2, 2, -3, 3);
 }
 
+RenderMode renderMode = wireframe;
 void RenderingEngine2::Render() const
 {
-    RenderMode renderMode = wireframe; // normal;
-
     GLuint positionSlot;
     GLuint colorSlot;
     if (renderMode == selection)
@@ -235,15 +239,12 @@ void RenderingEngine2::ApplyOrtho(float maxX, float maxY) const
     float a = 1.0/maxX;
     float b = 1.0/maxY;
 
-    Matrix orthoMatrix;
-    orthoMatrix.set(a, 0, 0, 0,
+    RenderContext::getMutableContext()->projectionMatrix.set(
+                    a, 0, 0, 0,
                     0, b, 0, 0,
                     0, 0, -1, 0,
                     0, 0, 0, 1);
-
-    GLint projectionUniform = ShaderProgram::GetActiveProgram()->GetUniformLocation("Projection");
-
-    glUniformMatrix4fv(projectionUniform, 1, 0, orthoMatrix.getPointer());
+    RenderContext::getMutableContext()->applyProjectionMatrix();
 }
 
 void RenderingEngine2::ApplyPerspective(float near, float far, float left, float right, float top, float bottom)
@@ -255,15 +256,13 @@ void RenderingEngine2::ApplyPerspective(float near, float far, float left, float
     float e = (far+ near)/(far - near);
     float f = -2*far*near/(far - near);
 
-    Matrix projMatrix;
-    projMatrix.set(
+    RenderContext::getMutableContext()->projectionMatrix.set(
         a,  0,  0,  0,
         0,  b,  0,  0,
         c,  d,  e,  -1,
         0,  0,  f,  1);
 
-    GLint projectionUniform = ShaderProgram::GetActiveProgram()->GetUniformLocation("Projection");
-    glUniformMatrix4fv(projectionUniform, 1, 0, projMatrix.getPointer());
+    RenderContext::getMutableContext()->applyProjectionMatrix();
 }
 
 void RenderingEngine2::Rotate(float deltaXRad, float deltaYRad, float deltaZRad)
@@ -323,10 +322,12 @@ void RenderingEngine2::ApplyRotation() const
 
 #define NORMALIZED_TOUCH_CHANGE_X(deltaX) (PI * ((float)deltaX) / (float)RenderContext::getContext()->getWidth())
 #define NORMALIZED_TOUCH_CHANGE_Y(deltaY) (PI * ((float)deltaY) / (float)RenderContext::getContext()->getHeight())
+#define TAP_MOVE_THRESHOLD 2
 
 void RenderingEngine2::onTouchStart(int x, int y)
 {
     touchStarted = true;
+    numTouchMoves = 0;
 
     touchX = x;
     touchY = y;
@@ -335,6 +336,11 @@ void RenderingEngine2::onTouchStart(int x, int y)
 void RenderingEngine2::onTouchMoved(int x, int y)
 {
     if (!touchStarted)
+        return;
+
+    numTouchMoves++;
+
+    if (numTouchMoves < TAP_MOVE_THRESHOLD)
         return;
 
     if (useRollPitchYaw)
@@ -356,10 +362,22 @@ void RenderingEngine2::onTouchEnd(int x, int y)
     if (!touchStarted)
         return;
 
+    if (numTouchMoves <= TAP_MOVE_THRESHOLD)
+    {
+        onTap();
+        return;
+    }
+
     touchX = x;
     touchY = y;
 
     touchStarted = false;
+}
+
+void RenderingEngine2::onTap()
+{
+    // TODO:: Get rid of this - only in place for validating 'onTap' logic
+    renderMode = (renderMode == wireframe ? normal : wireframe);
 }
 
 void RenderingEngine2::SetRoll(float rad)
@@ -376,5 +394,43 @@ void RenderingEngine2::SetYaw(float rad)
 {
     useRollPitchYaw = true;
     yaw = rad;
+}
+
+Vertex RenderingEngine2::GetViewDirection() const
+{
+    Vertex retValue;
+    Matrix rotMatrix;
+    static float xAxis []  = {1, 0, 0};
+    static float yAxis []  = {0, 1, 0};
+    static float zAxis []  = {0, 0, 1};
+
+    retValue.setPosition(0, 0, 1);
+
+    rotMatrix.makeRotationMatrix(yAxis, yaw);
+    retValue.multiplyByMatrix(&rotMatrix);
+
+    rotMatrix.makeRotationMatrix(xAxis, pitch);
+    retValue.multiplyByMatrix(&rotMatrix);
+
+    rotMatrix.makeRotationMatrix(zAxis, roll);
+    retValue.multiplyByMatrix(&rotMatrix);
+
+    return retValue;
+}
+
+void RenderingEngine2::GetWorldCoordFromScreenCoord(int screenX, int screenY, float worldHeight) const
+{
+    const Vertex floorNormal(0, 1, 0);
+    Vertex view = GetViewDirection();
+
+    // If view direction is close to (less than 5 degrees from) perpendicular to (0,1,0), don't try to find floor intersection
+    if (fabs(view.dot(&floorNormal)) < 5.0 * PI/180.0)
+    {
+        //    Return tapPos + viewDirection*10
+    }
+    else
+    {
+        // Return tapPos + viewDirection intersect with P(0,1,0,worldHeight)
+    }
 }
 

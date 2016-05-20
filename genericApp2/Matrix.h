@@ -31,6 +31,7 @@ public:
     void makeTranslationMatrix(float x, float y, float z);
     void makeIdentityMatrix();
 
+    bool getInverse(Matrix &out) const;
 private:
     float els[16];
 };

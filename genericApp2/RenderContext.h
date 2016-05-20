@@ -12,6 +12,7 @@
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #include "Matrix.h"
+#include "Vertex.h"
 
 #define VERTEX_HANDLE_NONE -1
 
@@ -46,9 +47,14 @@ public:
     bool isValid() const;
 
     void applyModelviewMatrix();
+    void applyProjectionMatrix();
 
     // TODO:: Need matrix stack
     Matrix modelviewMatrix;
+    Matrix projectionMatrix;
+
+    Vertex UnProject(float screenX, float screenY, float screenZ) const;
+
 private:
     // Singleton - no public constructor
     RenderContext() : positionHandle(0), colorHandle(0) {};

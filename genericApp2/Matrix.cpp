@@ -117,6 +117,137 @@ void Matrix::set(const Matrix &other)
         other.els[12], other.els[13], other.els[14], other.els[15]);
 }
 
+bool Matrix::getInverse(Matrix &matOut) const
+{
+    double out[16], det;
+    int i;
+
+    out[0] = els[5]  * els[10] * els[15] -
+        els[5]  * els[11] * els[14] -
+        els[9]  * els[6]  * els[15] +
+        els[9]  * els[7]  * els[14] +
+        els[13] * els[6]  * els[11] -
+        els[13] * els[7]  * els[10];
+
+    out[4] = -els[4]  * els[10] * els[15] +
+        els[4]  * els[11] * els[14] +
+        els[8]  * els[6]  * els[15] -
+        els[8]  * els[7]  * els[14] -
+        els[12] * els[6]  * els[11] +
+        els[12] * els[7]  * els[10];
+
+    out[8] = els[4]  * els[9] * els[15] -
+        els[4]  * els[11] * els[13] -
+        els[8]  * els[5] * els[15] +
+        els[8]  * els[7] * els[13] +
+        els[12] * els[5] * els[11] -
+        els[12] * els[7] * els[9];
+
+    out[12] = -els[4]  * els[9] * els[14] +
+        els[4]  * els[10] * els[13] +
+        els[8]  * els[5] * els[14] -
+        els[8]  * els[6] * els[13] -
+        els[12] * els[5] * els[10] +
+        els[12] * els[6] * els[9];
+
+    out[1] = -els[1]  * els[10] * els[15] +
+        els[1]  * els[11] * els[14] +
+        els[9]  * els[2] * els[15] -
+        els[9]  * els[3] * els[14] -
+        els[13] * els[2] * els[11] +
+        els[13] * els[3] * els[10];
+
+    out[5] = els[0]  * els[10] * els[15] -
+        els[0]  * els[11] * els[14] -
+        els[8]  * els[2] * els[15] +
+        els[8]  * els[3] * els[14] +
+        els[12] * els[2] * els[11] -
+        els[12] * els[3] * els[10];
+
+    out[9] = -els[0]  * els[9] * els[15] +
+        els[0]  * els[11] * els[13] +
+        els[8]  * els[1] * els[15] -
+        els[8]  * els[3] * els[13] -
+        els[12] * els[1] * els[11] +
+        els[12] * els[3] * els[9];
+
+    out[13] = els[0]  * els[9] * els[14] -
+        els[0]  * els[10] * els[13] -
+        els[8]  * els[1] * els[14] +
+        els[8]  * els[2] * els[13] +
+        els[12] * els[1] * els[10] -
+        els[12] * els[2] * els[9];
+
+    out[2] = els[1]  * els[6] * els[15] -
+        els[1]  * els[7] * els[14] -
+        els[5]  * els[2] * els[15] +
+        els[5]  * els[3] * els[14] +
+        els[13] * els[2] * els[7] -
+        els[13] * els[3] * els[6];
+
+    out[6] = -els[0]  * els[6] * els[15] +
+        els[0]  * els[7] * els[14] +
+        els[4]  * els[2] * els[15] -
+        els[4]  * els[3] * els[14] -
+        els[12] * els[2] * els[7] +
+        els[12] * els[3] * els[6];
+
+    out[10] = els[0]  * els[5] * els[15] -
+        els[0]  * els[7] * els[13] -
+        els[4]  * els[1] * els[15] +
+        els[4]  * els[3] * els[13] +
+        els[12] * els[1] * els[7] -
+        els[12] * els[3] * els[5];
+
+    out[14] = -els[0]  * els[5] * els[14] +
+        els[0]  * els[6] * els[13] +
+        els[4]  * els[1] * els[14] -
+        els[4]  * els[2] * els[13] -
+        els[12] * els[1] * els[6] +
+        els[12] * els[2] * els[5];
+
+    out[3] = -els[1] * els[6] * els[11] +
+        els[1] * els[7] * els[10] +
+        els[5] * els[2] * els[11] -
+        els[5] * els[3] * els[10] -
+        els[9] * els[2] * els[7] +
+        els[9] * els[3] * els[6];
+
+    out[7] = els[0] * els[6] * els[11] -
+        els[0] * els[7] * els[10] -
+        els[4] * els[2] * els[11] +
+        els[4] * els[3] * els[10] +
+        els[8] * els[2] * els[7] -
+        els[8] * els[3] * els[6];
+
+    out[11] = -els[0] * els[5] * els[11] +
+        els[0] * els[7] * els[9] +
+        els[4] * els[1] * els[11] -
+        els[4] * els[3] * els[9] -
+        els[8] * els[1] * els[7] +
+        els[8] * els[3] * els[5];
+
+    out[15] = els[0] * els[5] * els[10] -
+        els[0] * els[6] * els[9] -
+        els[4] * els[1] * els[10] +
+        els[4] * els[2] * els[9] +
+        els[8] * els[1] * els[6] -
+        els[8] * els[2] * els[5];
+
+    det = els[0] * out[0] + els[1] * out[4] + els[2] * out[8] + els[3] * out[12];
+
+    if (det == 0)
+        return false;
+
+    det = 1.0 / det;
+
+    for (i = 0; i < 16; i++)
+        matOut.els[i] = out[i] * det;
+
+    return true;
+}
+
+
 void MatrixTestSled::test()
 {
     Matrix identity;
@@ -153,6 +284,19 @@ void MatrixTestSled::test()
         {
             test_fail_if(m.get(row, col) != out.get(row, col), "Unexpected value after identity multiply");
             v++;
+        }
+    }
+
+    m.set(1, 0, 0, 0,
+          0, 0, 1, 0,
+          0, 1, 0, 0,
+          0, 0, 0, 1);
+    m.getInverse(out);
+    for (int row = 0; row < 4; row++)
+    {
+        for (int col = 0; col < 4; col++)
+        {
+            test_fail_if(m.get(row, col) != out.get(row, col), "Unexpected value after inverse");
         }
     }
 

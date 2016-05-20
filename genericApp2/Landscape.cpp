@@ -35,6 +35,23 @@ Landscape::Landscape() : gridVertices(NUM_VERTICES), domeVertices(NUM_DOME_VERTI
     {
         domeVertices[i].setColor(0.5, 0.5, 1.0);
     }
+
+    cellarVertices[0].setPosition(0, -range, 0);
+    cellarVertices[1].setPosition(-range, 0, -range);
+    cellarVertices[2].setPosition(-range, 0,  range);
+    cellarVertices[3].setPosition( range, 0,  range);
+    cellarVertices[4].setPosition( range, 0, -range);
+    cellarVertices[5].setPosition(-range, 0, -range);
+    for(int i = 0 ; i < NUM_DOME_VERTICES; i++)
+    {
+        cellarVertices[i].setColor(0, 1, 0);
+    }
+    cellarVertices[0].setColor(0,0,0);
+    cellarVertices[1].setColor(1,0,0);
+    cellarVertices[2].setColor(0,1,0);
+    cellarVertices[3].setColor(1,0,1);
+    cellarVertices[4].setColor(1,1,0);
+    cellarVertices[5].setColor(1,0,0);
 }
 
 const Landscape *Landscape::getLandscape()
@@ -58,13 +75,18 @@ void Landscape::render(RenderMode mode) const
         firstVisit = false;
     }
 
-    glVertexAttribPointer(RenderContext::getContext()->getPositionHandle(), 3, GL_FLOAT, GL_FALSE, gridVertices.getStride(), gridVertices.getPositionPointer());
-    glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, gridVertices.getStride(), gridVertices.getColorPointer());
-
-    glDrawElements(GL_LINES, NUM_VERTICES, GL_UNSIGNED_SHORT, indices);
-
     glVertexAttribPointer(RenderContext::getContext()->getPositionHandle(), 3, GL_FLOAT, GL_FALSE, domeVertices.getStride(), domeVertices.getPositionPointer());
     glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, domeVertices.getStride(), domeVertices.getColorPointer());
 
     glDrawElements(GL_TRIANGLE_FAN, NUM_DOME_VERTICES, GL_UNSIGNED_SHORT, indices);
+
+    glVertexAttribPointer(RenderContext::getContext()->getPositionHandle(), 3, GL_FLOAT, GL_FALSE, cellarVertices.getStride(), cellarVertices.getPositionPointer());
+    glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, cellarVertices.getStride(), cellarVertices.getColorPointer());
+
+    glDrawElements(GL_TRIANGLE_FAN, NUM_DOME_VERTICES, GL_UNSIGNED_SHORT, indices);
+
+    glVertexAttribPointer(RenderContext::getContext()->getPositionHandle(), 3, GL_FLOAT, GL_FALSE, gridVertices.getStride(), gridVertices.getPositionPointer());
+    glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, gridVertices.getStride(), gridVertices.getColorPointer());
+
+    glDrawElements(GL_LINES, NUM_VERTICES, GL_UNSIGNED_SHORT, indices);
 }

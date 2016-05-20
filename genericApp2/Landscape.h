@@ -16,6 +16,7 @@ private:
 
     VertexList gridVertices;
     VertexList domeVertices;
+    VertexList cellarVertices;
 };
 
 #endif // !__LANDSCAPE_H__

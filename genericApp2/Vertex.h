@@ -9,10 +9,13 @@
 #ifndef __genericApp2__Vertex__
 #define __genericApp2__Vertex__
 
+#include "Matrix.h"
+
 struct Vertex
 {
 public:
     Vertex();
+    Vertex(float x, float y, float z);
 
     float position[3];
     float color[4];
@@ -21,6 +24,13 @@ public:
     void setPosition(float x, float y, float z);
     void setColor(float r, float g, float b, float a = 1);
 
+    void multiplyByMatrix(const Matrix *m);
+
+    inline float getX() const { return position[0]; };
+    inline float getY() const { return position[1]; };
+    inline float getZ() const { return position[2]; };
+
+    float dot(const Vertex *v) const;
 };
 
 class VertexList
