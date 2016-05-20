@@ -12,25 +12,19 @@
 #define MIN(x, y) (x < y ? x : y)
 
 // TODO:: Need a separation between Vector and Vertex concepts.  This munges them together
-Vertex::Vertex()
+Vertex::Vertex() : Vector(0, 0, 0)
 {
-    position[0] = position[1] = position[2] = 0;
     color[0] = color[1] = color[2] = color[3] = 1;
 }
 
-Vertex::Vertex(float x, float y, float z)
+Vertex::Vertex(float x, float y, float z) : Vector(x, y, z)
 {
-    position[0] = x;
-    position[1] = y;
-    position[2] = z;
     color[0] = color[1] = color[2] = color[3] = 1;
 }
 
 void Vertex::setPosition(float x, float y, float z)
 {
-    position[0] = x;
-    position[1] = y;
-    position[2] = z;
+    set(x, y, z);
 }
 
 void Vertex::setColor(float r, float g, float b, float a)
@@ -41,11 +35,9 @@ void Vertex::setColor(float r, float g, float b, float a)
     color[3] = a;
 }
 
-Vertex Vertex::operator=(const Vertex &v)
+Vertex& Vertex::operator=(const Vertex &v)
 {
-    position[0] = v.position[0];
-    position[1] = v.position[1];
-    position[2] = v.position[2];
+    set(v.getX(), v.getY(), v.getZ());
 
     color[0] = v.color[0];
     color[1] = v.color[1];
@@ -97,7 +89,7 @@ Vertex & VertexList::operator[](unsigned int index)
 
 float * VertexList::getPositionPointer() const
 {
-    return vertices[0].position;
+    return vertices[0].getPointer();
 }
 
 float * VertexList::getColorPointer() const
@@ -113,21 +105,4 @@ unsigned int VertexList::getStride() const
 unsigned int VertexList::getNumVertices() const
 {
     return numVertices;
-}
-
-void Vertex::multiplyByMatrix(const Matrix *m)
-{
-    setPosition(
-        getX() * m->get(0, 0) + getY() * m->get(0, 1) + getZ() * m->get(0, 2) + m->get(0, 3),
-        getX() * m->get(1, 0) + getY() * m->get(1, 1) + getZ() * m->get(1, 2) + m->get(1, 3),
-        getX() * m->get(2, 0) + getY() * m->get(2, 1) + getZ() * m->get(2, 2) + m->get(2, 3)
-    );
-}
-
-float Vertex::dot(const Vertex *v) const
-{
-    return
-        getX() * v->getX() +
-        getY() * v->getY() +
-        getZ() * v->getZ();
 }

@@ -16,6 +16,7 @@
 #include "Landscape.h"
 #include "RenderContext.h"
 #include "Matrix.h"
+#include "Vector.h"
 #include "Util.h"
 
 #define STRINGIFY(A) #A
@@ -114,7 +115,7 @@ public:
     void onTouchStart(int x, int y);
     void onTouchMoved(int x, int y);
     void onTouchEnd(int x, int y);
-    void onTap();
+    void onTap(int x, int y);
 
 private:
     GLuint BuildShader(const char *source, GLenum shaderType) const;
@@ -126,6 +127,7 @@ private:
     void GetWorldCoordFromScreenCoord(int screenX, int screenY, float worldHeight) const;
     GLuint m_framebuffer;
     GLuint m_renderbuffer;
+    GLuint m_depthbuffer;
     ShaderProgram normalProgram, selectionProgram;
     float xRot, yRot, zRot;
     float roll, pitch, yaw;
@@ -143,10 +145,13 @@ void dotests()
 {
     MatrixTestSled mts;
     mts.test();
+
+    VectorTestSled vts;
+    vts.test();
 }
 IRenderingEngine* CreateRenderer2()
 {
-    if (0)
+    if (1)
         dotests();
 
     return new RenderingEngine2();
@@ -154,6 +159,9 @@ IRenderingEngine* CreateRenderer2()
 
 RenderingEngine2::RenderingEngine2()
 {
+    glGenFramebuffers(1, &m_framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
+
     glGenRenderbuffers(1, &m_renderbuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_renderbuffer);
 
@@ -170,10 +178,21 @@ RenderingEngine2::RenderingEngine2()
 
 void RenderingEngine2::Initialize(int width, int height)
 {
-    glGenFramebuffers(1, &m_framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
+int tw, th;
+glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &tw);
+glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &th);
+////    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, width, height);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_renderbuffer);
+/*
+    // Create and enable depth buffer testing
+    glGenRenderbuffers(1, &m_depthbuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_depthbuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, tw, th);
 
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthbuffer);
+
+    glEnable(GL_DEPTH_TEST);
+*/
     RenderContext::getMutableContext()->setWidth(width);
     RenderContext::getMutableContext()->setHeight(height);
 
@@ -205,7 +224,7 @@ void RenderingEngine2::Render() const
     colorSlot = ShaderProgram::GetActiveProgram()->GetAttribLocation("SourceColor");
 
     glClearColor(0.2,0.2,0.2,1);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     RenderContext::getMutableContext()->setPositionHandle(positionSlot);
     RenderContext::getMutableContext()->setColorHandle(colorSlot);
@@ -364,7 +383,7 @@ void RenderingEngine2::onTouchEnd(int x, int y)
 
     if (numTouchMoves <= TAP_MOVE_THRESHOLD)
     {
-        onTap();
+        onTap(x, y);
         return;
     }
 
@@ -374,10 +393,11 @@ void RenderingEngine2::onTouchEnd(int x, int y)
     touchStarted = false;
 }
 
-void RenderingEngine2::onTap()
+void RenderingEngine2::onTap(int x, int y)
 {
     // TODO:: Get rid of this - only in place for validating 'onTap' logic
     renderMode = (renderMode == wireframe ? normal : wireframe);
+    GetWorldCoordFromScreenCoord(x, y, 0);
 }
 
 void RenderingEngine2::SetRoll(float rad)
@@ -407,13 +427,13 @@ Vertex RenderingEngine2::GetViewDirection() const
     retValue.setPosition(0, 0, 1);
 
     rotMatrix.makeRotationMatrix(yAxis, yaw);
-    retValue.multiplyByMatrix(&rotMatrix);
+    retValue.multiplyByMatrix(rotMatrix);
 
     rotMatrix.makeRotationMatrix(xAxis, pitch);
-    retValue.multiplyByMatrix(&rotMatrix);
+    retValue.multiplyByMatrix(rotMatrix);
 
     rotMatrix.makeRotationMatrix(zAxis, roll);
-    retValue.multiplyByMatrix(&rotMatrix);
+    retValue.multiplyByMatrix(rotMatrix);
 
     return retValue;
 }
@@ -424,13 +444,16 @@ void RenderingEngine2::GetWorldCoordFromScreenCoord(int screenX, int screenY, fl
     Vertex view = GetViewDirection();
 
     // If view direction is close to (less than 5 degrees from) perpendicular to (0,1,0), don't try to find floor intersection
-    if (fabs(view.dot(&floorNormal)) < 5.0 * PI/180.0)
+    if (false && fabs(view.dot(floorNormal)) < 5.0 * PI/180.0)
     {
         //    Return tapPos + viewDirection*10
     }
     else
     {
+        Vertex near, far;
         // Return tapPos + viewDirection intersect with P(0,1,0,worldHeight)
+        near = RenderContext::getContext()->UnProject(screenX, 480-screenY, 0);
+        far = RenderContext::getContext()->UnProject(screenX, 480-screenY, 1);
     }
 }
 

@@ -48,8 +48,8 @@
             m_renderingEngine = CreateRenderer2();
         }
 
-        m_renderingEngine->Initialize(CGRectGetWidth(frame), CGRectGetHeight(frame));
         [m_context renderbufferStorage:GL_RENDERBUFFER_OES fromDrawable:eaglLayer];
+        m_renderingEngine->Initialize(CGRectGetWidth(frame), CGRectGetHeight(frame));
 
         [self drawView: nil];
 

@@ -22,6 +22,7 @@
 		C6A35E941B596ECB00810AB4 /* RenderingEngine2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C6A35E931B596ECB00810AB4 /* RenderingEngine2.cpp */; };
 		C6BBDCF01B64F66100C5B817 /* simple.frag in Resources */ = {isa = PBXBuildFile; fileRef = C6BBDCEE1B64F66100C5B817 /* simple.frag */; };
 		C6BBDCF11B64F66100C5B817 /* simple.vert in Resources */ = {isa = PBXBuildFile; fileRef = C6BBDCEF1B64F66100C5B817 /* simple.vert */; };
+		C6D664DF1C0393F30096DFA5 /* Vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C6D664DD1C0393F30096DFA5 /* Vector.cpp */; };
 		C6DE9D341B704C2900F5230F /* Polygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C6DE9D321B704C2900F5230F /* Polygon.cpp */; };
 		C6DE9D381B704D0600F5230F /* RenderContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C6DE9D361B704D0600F5230F /* RenderContext.cpp */; };
 		C6E1D8841B719D87002AE0FA /* Vertex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C6E1D8821B719D87002AE0FA /* Vertex.cpp */; };
@@ -66,6 +67,8 @@
 		C6BBDCEE1B64F66100C5B817 /* simple.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = simple.frag; sourceTree = "<group>"; };
 		C6BBDCEF1B64F66100C5B817 /* simple.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = simple.vert; sourceTree = "<group>"; };
 		C6BDB99E1B7C27980029A0CA /* Util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Util.h; sourceTree = "<group>"; };
+		C6D664DD1C0393F30096DFA5 /* Vector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Vector.cpp; sourceTree = "<group>"; };
+		C6D664DE1C0393F30096DFA5 /* Vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vector.h; sourceTree = "<group>"; };
 		C6DE9D321B704C2900F5230F /* Polygon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Polygon.cpp; sourceTree = "<group>"; };
 		C6DE9D331B704C2900F5230F /* Polygon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Polygon.h; sourceTree = "<group>"; };
 		C6DE9D351B704CD100F5230F /* IRenderable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRenderable.h; sourceTree = "<group>"; };
@@ -123,6 +126,8 @@
 		C6A35E5A1B58435800810AB4 /* genericApp2 */ = {
 			isa = PBXGroup;
 			children = (
+				C6D664DD1C0393F30096DFA5 /* Vector.cpp */,
+				C6D664DE1C0393F30096DFA5 /* Vector.h */,
 				C641AC381BD33A5600474E7B /* AccelerometerFilter.h */,
 				C641AC391BD33A5600474E7B /* AccelerometerFilter.m */,
 				C6BBDCED1B64F66100C5B817 /* shaders */,
@@ -302,6 +307,7 @@
 				C6E1D8841B719D87002AE0FA /* Vertex.cpp in Sources */,
 				C6E1D8871B73B401002AE0FA /* Cube.cpp in Sources */,
 				C6A35E5E1B58435800810AB4 /* main.m in Sources */,
+				C6D664DF1C0393F30096DFA5 /* Vector.cpp in Sources */,
 				C6A35E8A1B5847D300810AB4 /* GLView.mm in Sources */,
 				C6A35E921B586BA200810AB4 /* RenderingEngine1.cpp in Sources */,
 				C6A35E941B596ECB00810AB4 /* RenderingEngine2.cpp in Sources */,
