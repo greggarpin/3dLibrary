@@ -10,6 +10,7 @@
 		C641AC3A1BD33A5600474E7B /* AccelerometerFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = C641AC391BD33A5600474E7B /* AccelerometerFilter.m */; };
 		C641AC3D1BD5C9C800474E7B /* Landscape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C641AC3C1BD5C9C800474E7B /* Landscape.cpp */; };
 		C655F6E11BA88C4000FC10B8 /* selection.vert in Resources */ = {isa = PBXBuildFile; fileRef = C655F6E01BA88C4000FC10B8 /* selection.vert */; };
+		C665F9D11C19B57400E3E644 /* PositionalObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C665F9D01C19B57400E3E644 /* PositionalObject.cpp */; };
 		C6A35E5E1B58435800810AB4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C6A35E5D1B58435800810AB4 /* main.m */; };
 		C6A35E611B58435800810AB4 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = C6A35E601B58435800810AB4 /* AppDelegate.mm */; };
 		C6A35E641B58435800810AB4 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = C6A35E631B58435800810AB4 /* ViewController.mm */; };
@@ -20,6 +21,7 @@
 		C6A35E8E1B5848BA00810AB4 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6A35E8D1B5848BA00810AB4 /* QuartzCore.framework */; };
 		C6A35E921B586BA200810AB4 /* RenderingEngine1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C6A35E901B586BA200810AB4 /* RenderingEngine1.cpp */; };
 		C6A35E941B596ECB00810AB4 /* RenderingEngine2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C6A35E931B596ECB00810AB4 /* RenderingEngine2.cpp */; };
+		C6B2F6BD1C1D04C2009A8583 /* IRenderable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C6B2F6BC1C1D04C2009A8583 /* IRenderable.cpp */; };
 		C6BBDCF01B64F66100C5B817 /* simple.frag in Resources */ = {isa = PBXBuildFile; fileRef = C6BBDCEE1B64F66100C5B817 /* simple.frag */; };
 		C6BBDCF11B64F66100C5B817 /* simple.vert in Resources */ = {isa = PBXBuildFile; fileRef = C6BBDCEF1B64F66100C5B817 /* simple.vert */; };
 		C6D664DF1C0393F30096DFA5 /* Vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C6D664DD1C0393F30096DFA5 /* Vector.cpp */; };
@@ -46,6 +48,9 @@
 		C641AC3B1BD5C8B000474E7B /* Landscape.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Landscape.h; sourceTree = "<group>"; };
 		C641AC3C1BD5C9C800474E7B /* Landscape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Landscape.cpp; sourceTree = "<group>"; };
 		C655F6E01BA88C4000FC10B8 /* selection.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = selection.vert; sourceTree = "<group>"; };
+		C665F9CF1C19B43200E3E644 /* PositionalObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PositionalObject.h; sourceTree = "<group>"; };
+		C665F9D01C19B57400E3E644 /* PositionalObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PositionalObject.cpp; sourceTree = "<group>"; };
+		C665F9D41C19B73D00E3E644 /* Stack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Stack.h; path = dataStructures/Stack.h; sourceTree = "<group>"; };
 		C6A35E581B58435800810AB4 /* genericApp2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = genericApp2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6A35E5C1B58435800810AB4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C6A35E5D1B58435800810AB4 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -63,6 +68,7 @@
 		C6A35E8F1B5869CE00810AB4 /* IRenderingEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IRenderingEngine.h; sourceTree = "<group>"; };
 		C6A35E901B586BA200810AB4 /* RenderingEngine1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RenderingEngine1.cpp; sourceTree = "<group>"; };
 		C6A35E931B596ECB00810AB4 /* RenderingEngine2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RenderingEngine2.cpp; sourceTree = "<group>"; };
+		C6B2F6BC1C1D04C2009A8583 /* IRenderable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IRenderable.cpp; sourceTree = "<group>"; };
 		C6BBDCEB1B64F5DA00C5B817 /* GLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLView.h; sourceTree = "<group>"; };
 		C6BBDCEE1B64F66100C5B817 /* simple.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = simple.frag; sourceTree = "<group>"; };
 		C6BBDCEF1B64F66100C5B817 /* simple.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = simple.vert; sourceTree = "<group>"; };
@@ -126,37 +132,41 @@
 		C6A35E5A1B58435800810AB4 /* genericApp2 */ = {
 			isa = PBXGroup;
 			children = (
-				C6D664DD1C0393F30096DFA5 /* Vector.cpp */,
-				C6D664DE1C0393F30096DFA5 /* Vector.h */,
+				C665F9D41C19B73D00E3E644 /* Stack.h */,
 				C641AC381BD33A5600474E7B /* AccelerometerFilter.h */,
 				C641AC391BD33A5600474E7B /* AccelerometerFilter.m */,
-				C6BBDCED1B64F66100C5B817 /* shaders */,
-				C6BBDCEB1B64F5DA00C5B817 /* GLView.h */,
-				C6A35E891B5847D300810AB4 /* GLView.mm */,
 				C6A35E5F1B58435800810AB4 /* AppDelegate.h */,
 				C6A35E601B58435800810AB4 /* AppDelegate.mm */,
-				C6A35E621B58435800810AB4 /* ViewController.h */,
-				C6A35E631B58435800810AB4 /* ViewController.mm */,
-				C6A35E681B58435800810AB4 /* Images.xcassets */,
-				C6A35E5B1B58435800810AB4 /* Supporting Files */,
-				C6A35E8F1B5869CE00810AB4 /* IRenderingEngine.h */,
-				C6A35E901B586BA200810AB4 /* RenderingEngine1.cpp */,
-				C6A35E931B596ECB00810AB4 /* RenderingEngine2.cpp */,
-				C6BDB99E1B7C27980029A0CA /* Util.h */,
-				C6E1D8891B73D612002AE0FA /* Matrix.h */,
-				C6E1D8881B73D612002AE0FA /* Matrix.cpp */,
-				C6DE9D321B704C2900F5230F /* Polygon.cpp */,
-				C6DE9D351B704CD100F5230F /* IRenderable.h */,
 				C6E1D8851B73B400002AE0FA /* Cube.cpp */,
 				C6E1D8861B73B400002AE0FA /* Cube.h */,
+				C665F9CF1C19B43200E3E644 /* PositionalObject.h */,
+				C665F9D01C19B57400E3E644 /* PositionalObject.cpp */,
+				C6BBDCEB1B64F5DA00C5B817 /* GLView.h */,
+				C6A35E891B5847D300810AB4 /* GLView.mm */,
+				C6A35E681B58435800810AB4 /* Images.xcassets */,
+				C6DE9D351B704CD100F5230F /* IRenderable.h */,
+				C6A35E8F1B5869CE00810AB4 /* IRenderingEngine.h */,
+				C6B2F6BC1C1D04C2009A8583 /* IRenderable.cpp */,
+				C641AC3C1BD5C9C800474E7B /* Landscape.cpp */,
+				C641AC3B1BD5C8B000474E7B /* Landscape.h */,
+				C6E1D8881B73D612002AE0FA /* Matrix.cpp */,
+				C6E1D8891B73D612002AE0FA /* Matrix.h */,
+				C6DE9D321B704C2900F5230F /* Polygon.cpp */,
 				C6DE9D331B704C2900F5230F /* Polygon.h */,
 				C6DE9D361B704D0600F5230F /* RenderContext.cpp */,
 				C6DE9D371B704D0600F5230F /* RenderContext.h */,
+				C6A35E901B586BA200810AB4 /* RenderingEngine1.cpp */,
+				C6A35E931B596ECB00810AB4 /* RenderingEngine2.cpp */,
+				C6BBDCED1B64F66100C5B817 /* shaders */,
+				C6A35E5B1B58435800810AB4 /* Supporting Files */,
+				C6E1D88B1B744218002AE0FA /* TestSled.h */,
+				C6BDB99E1B7C27980029A0CA /* Util.h */,
+				C6D664DD1C0393F30096DFA5 /* Vector.cpp */,
+				C6D664DE1C0393F30096DFA5 /* Vector.h */,
 				C6E1D8821B719D87002AE0FA /* Vertex.cpp */,
 				C6E1D8831B719D87002AE0FA /* Vertex.h */,
-				C6E1D88B1B744218002AE0FA /* TestSled.h */,
-				C641AC3B1BD5C8B000474E7B /* Landscape.h */,
-				C641AC3C1BD5C9C800474E7B /* Landscape.cpp */,
+				C6A35E621B58435800810AB4 /* ViewController.h */,
+				C6A35E631B58435800810AB4 /* ViewController.mm */,
 			);
 			path = genericApp2;
 			sourceTree = "<group>";
@@ -304,6 +314,7 @@
 				C6DE9D341B704C2900F5230F /* Polygon.cpp in Sources */,
 				C6E1D88A1B73D612002AE0FA /* Matrix.cpp in Sources */,
 				C6A35E611B58435800810AB4 /* AppDelegate.mm in Sources */,
+				C665F9D11C19B57400E3E644 /* PositionalObject.cpp in Sources */,
 				C6E1D8841B719D87002AE0FA /* Vertex.cpp in Sources */,
 				C6E1D8871B73B401002AE0FA /* Cube.cpp in Sources */,
 				C6A35E5E1B58435800810AB4 /* main.m in Sources */,
@@ -311,6 +322,7 @@
 				C6A35E8A1B5847D300810AB4 /* GLView.mm in Sources */,
 				C6A35E921B586BA200810AB4 /* RenderingEngine1.cpp in Sources */,
 				C6A35E941B596ECB00810AB4 /* RenderingEngine2.cpp in Sources */,
+				C6B2F6BD1C1D04C2009A8583 /* IRenderable.cpp in Sources */,
 				C6DE9D381B704D0600F5230F /* RenderContext.cpp in Sources */,
 				C641AC3D1BD5C9C800474E7B /* Landscape.cpp in Sources */,
 			);

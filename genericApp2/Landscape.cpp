@@ -36,12 +36,12 @@ Landscape::Landscape() : gridVertices(NUM_VERTICES), domeVertices(NUM_DOME_VERTI
         domeVertices[i].setColor(0.5, 0.5, 1.0);
     }
 
-    cellarVertices[0].setPosition(0, -range, 0);
-    cellarVertices[1].setPosition(-range, 0, -range);
-    cellarVertices[2].setPosition(-range, 0,  range);
-    cellarVertices[3].setPosition( range, 0,  range);
-    cellarVertices[4].setPosition( range, 0, -range);
-    cellarVertices[5].setPosition(-range, 0, -range);
+    cellarVertices[5].setPosition(0, -range, 0);
+    cellarVertices[4].setPosition(-range, 0, -range);
+    cellarVertices[3].setPosition(-range, 0,  range);
+    cellarVertices[2].setPosition( range, 0,  range);
+    cellarVertices[1].setPosition( range, 0, -range);
+    cellarVertices[0].setPosition(-range, 0, -range);
     for(int i = 0 ; i < NUM_DOME_VERTICES; i++)
     {
         cellarVertices[i].setColor(0, 1, 0);

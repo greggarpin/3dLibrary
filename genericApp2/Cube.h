@@ -9,9 +9,9 @@
 #ifndef __genericApp2__Cube__
 #define __genericApp2__Cube__
 
-#include "IRenderable.h"
+#include "PositionalObject.h"
 
-class Cube : public IRenderable
+class Cube : public PositionalObject
 {
 public:
     Cube();
@@ -19,8 +19,13 @@ public:
 
     void render(RenderMode mode) const;
 
+    inline void setColor(const Vector &pColor) { setColor(pColor.getR(), pColor.getG(), pColor.getB()); };
+    void setColor(float r, float g, float b);
+    const Vector &getColor() const { return color; };
+
 private:
     VertexList vertices;
+    Vector color;
 };
 
 #endif /* defined(__genericApp2__Cube__) */

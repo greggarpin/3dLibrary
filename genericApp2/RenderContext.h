@@ -13,8 +13,10 @@
 #include <OpenGLES/ES2/glext.h>
 #include "Matrix.h"
 #include "Vertex.h"
+#include "Stack.h"
 
 #define VERTEX_HANDLE_NONE -1
+#define MATRIX_STACK_SIZE 16
 
 class RenderContext
 {
@@ -48,8 +50,13 @@ public:
 
     void applyModelviewMatrix();
     void applyProjectionMatrix();
+    void applySelectionId(unsigned int selectionId);
 
-    // TODO:: Need matrix stack
+    unsigned int getSelectionIdAt(unsigned int x, unsigned int y) const;
+
+    void pushMatrix();
+    void popMatrix();
+
     Matrix modelviewMatrix;
     Matrix projectionMatrix;
 
@@ -57,7 +64,7 @@ public:
 
 private:
     // Singleton - no public constructor
-    RenderContext() : positionHandle(0), colorHandle(0) {};
+    RenderContext() : positionHandle(0), colorHandle(0), matrixStack(MATRIX_STACK_SIZE) {};
 
     GLuint programHandle;
     GLuint positionHandle;
@@ -66,6 +73,8 @@ private:
     int width, height;
 
     static RenderContext rc;
+
+    Stack<Matrix*> matrixStack;
 };
 
 #endif /* defined(__genericApp2__RenderContext__) */

@@ -32,6 +32,13 @@ void Vector::set(float x, float y, float z)
     els[2] = z;
 }
 
+void Vector::add(float x, float y, float z)
+{
+    els[0] += x;
+    els[1] += y;
+    els[2] += z;
+}
+
 void Vector::multiplyByMatrix(const Matrix &m)
 {
     set(getX() * m.get(0, 0) + getY() * m.get(0, 1) + getZ() * m.get(0, 2) + m.get(0, 3),

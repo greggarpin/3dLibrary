@@ -39,12 +39,12 @@ void Matrix::multiply(const Matrix &other)
 void Matrix::set(unsigned int row, unsigned int col, float value)
 {
     // assert(row < 4 && col < 4);
-    els[row * 4 + col] = value;
+    els[col * 4 + row] = value;
 }
 
 float Matrix::get(unsigned int row, unsigned int col) const
 {
-    return els[row * 4 + col];
+    return els[col * 4 + row];
 }
 
 void Matrix::set(float v00, float v01, float v02, float v03,
@@ -52,10 +52,10 @@ void Matrix::set(float v00, float v01, float v02, float v03,
                  float v20, float v21, float v22, float v23,
                  float v30, float v31, float v32, float v33)
 {
-    els[0]  = v00; els[1]  = v01; els[2]  = v02; els[3]  = v03;
-    els[4]  = v10; els[5]  = v11; els[6]  = v12; els[7]  = v13;
-    els[8]  = v20; els[9]  = v21; els[10] = v22; els[11] = v23;
-    els[12] = v30; els[13] = v31; els[14] = v32; els[15] = v33;
+    els[0]  = v00; els[4]  = v01; els[8]  = v02; els[12] = v03;
+    els[1]  = v10; els[5]  = v11; els[9]  = v12; els[13] = v13;
+    els[2]  = v20; els[6]  = v21; els[10] = v22; els[14] = v23;
+    els[3]  = v30; els[7]  = v31; els[11] = v32; els[15] = v33;
 }
 
 void Matrix::makeRotationMatrix(float *axis, float radians)
@@ -111,10 +111,8 @@ void Matrix::makeIdentityMatrix()
 
 void Matrix::set(const Matrix &other)
 {
-    set(other.els[0], other.els[1], other.els[2], other.els[3],
-        other.els[4], other.els[5], other.els[6], other.els[7],
-        other.els[8], other.els[9], other.els[10], other.els[11],
-        other.els[12], other.els[13], other.els[14], other.els[15]);
+    for (int i = 0; i < 16; i++)
+        els[i] = other.els[i];
 }
 
 bool Matrix::getInverse(Matrix &matOut) const

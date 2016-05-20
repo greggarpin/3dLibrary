@@ -22,7 +22,13 @@ public:
     inline float getZ() const { return els[2]; };
     inline float * getPointer() { return els; };
 
+    void add(float x, float y, float z);
+
     float dot(const Vector &v) const;
+
+    inline float getR() const { return els[0]; };
+    inline float getG() const { return els[1]; };
+    inline float getB() const { return els[2]; };
 };
 
 

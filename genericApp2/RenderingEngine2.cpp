@@ -16,6 +16,7 @@
 #include "Landscape.h"
 #include "RenderContext.h"
 #include "Matrix.h"
+#include "Stack.h"
 #include "Vector.h"
 #include "Util.h"
 
@@ -125,6 +126,9 @@ private:
     void ApplyRotation() const;
     Vertex GetViewDirection() const;
     void GetWorldCoordFromScreenCoord(int screenX, int screenY, float worldHeight) const;
+    void RenderObject(const IRenderable &obj) const;
+    void selectPositionalObject(PositionalObject *obj);
+    void deselectPositionalObject();
     GLuint m_framebuffer;
     GLuint m_renderbuffer;
     GLuint m_depthbuffer;
@@ -139,25 +143,36 @@ private:
 
     Polygon testPolygon;
     Cube testCube;
+    Cube tc[10];
+    IRenderable **renderableObjs;
+    unsigned int numRenderableObjs;
+    PositionalObject *selectedPositionalObject;
 };
 
 void dotests()
 {
+    IRenderableTestSled rts;
+    rts.test();
+    
     MatrixTestSled mts;
     mts.test();
 
     VectorTestSled vts;
     vts.test();
+
+    StackTestSled sts;
+    sts.test();
 }
 IRenderingEngine* CreateRenderer2()
 {
+    // TODO:: Don't do these when going live!
     if (1)
         dotests();
 
     return new RenderingEngine2();
 }
 
-RenderingEngine2::RenderingEngine2()
+RenderingEngine2::RenderingEngine2() : numRenderableObjs(0), selectedPositionalObject(NULL)
 {
     glGenFramebuffers(1, &m_framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
@@ -174,25 +189,45 @@ RenderingEngine2::RenderingEngine2()
     cameraPosition[0] = 0;
     cameraPosition[1] = 48;
     cameraPosition[0] = 0;
+
+    renderableObjs = new IRenderable*[numRenderableObjs++];
+    renderableObjs[0] = &testCube;
+    int i = 0;
+    tc[i++].SetPosition(-3, 3, 3);
+    tc[i++].SetPosition( 3, 3, 3);
+    tc[i++].SetPosition(-3, -3, 3);
+    tc[i++].SetPosition( 3, -3, 3);
+    tc[i++].SetPosition(-8, 8, 7);
+    tc[i++].SetPosition(-8, -8, 7);
+    tc[i++].SetPosition( 8, -8, 7);
+    tc[i++].SetPosition( 8, 8, 7);
+//    tc[i++].SetPosition(-1, 1, 3);
+//    tc[i++].SetPosition(-1, 1, 3);
+    for (unsigned int i = 0; i < 8; i++)
+    {
+        renderableObjs[numRenderableObjs++] = &tc[i];
+    }
+
+    testCube.SetPosition(0, 0, 2);
+    testCube.SetRotation(0, PI/6, 0);
 }
 
 void RenderingEngine2::Initialize(int width, int height)
 {
-int tw, th;
-glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &tw);
-glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &th);
-////    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, width, height);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_renderbuffer);
-/*
+
     // Create and enable depth buffer testing
     glGenRenderbuffers(1, &m_depthbuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_depthbuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, tw, th);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthbuffer);
 
+    glBindRenderbuffer(GL_RENDERBUFFER, m_renderbuffer);
+
     glEnable(GL_DEPTH_TEST);
-*/
+    glEnable(GL_CULL_FACE);
+
     RenderContext::getMutableContext()->setWidth(width);
     RenderContext::getMutableContext()->setHeight(height);
 
@@ -203,18 +238,27 @@ glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &th);
 
     selectionProgram.Use();
     ApplyRotation();
-    ApplyPerspective(-1, 10, -2, 2, -3, 3);
+    ApplyPerspective(1, 10, -2, 2, -3, 3);
 
     normalProgram.Use();
 
     ApplyRotation();
 //    ApplyOrtho(2, 3);
-    ApplyPerspective(-1, 10, -2, 2, -3, 3);
+    ApplyPerspective(1, 10, -2, 2, -3, 3);
 }
 
-RenderMode renderMode = wireframe;
+RenderMode renderMode = normal;
+
+void RenderingEngine2::RenderObject(const IRenderable &obj) const
+{
+    obj.PreRender(renderMode);
+    obj.render(renderMode);
+    obj.PostRender(renderMode);
+}
 void RenderingEngine2::Render() const
 {
+    RenderContext::getMutableContext()->applySelectionId(0);
+
     GLuint positionSlot;
     GLuint colorSlot;
     if (renderMode == selection)
@@ -223,32 +267,29 @@ void RenderingEngine2::Render() const
     positionSlot = ShaderProgram::GetActiveProgram()->GetAttribLocation("Position");
     colorSlot = ShaderProgram::GetActiveProgram()->GetAttribLocation("SourceColor");
 
-    glClearColor(0.2,0.2,0.2,1);
+    if (renderMode == selection)
+    {
+        glClearColor(0, 0, 0, 0);
+    }
+    else
+    {
+        glClearColor(0.2,0.2,0.2,1);
+    }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     RenderContext::getMutableContext()->setPositionHandle(positionSlot);
     RenderContext::getMutableContext()->setColorHandle(colorSlot);
 
-    Landscape::getLandscape()->render(renderMode);
+   /// Landscape::getLandscape()->render(renderMode);
 
     ApplyRotation();
 
-    testCube.render(renderMode);
-/*
-    Matrix o(RenderContext::getContext()->modelviewMatrix);
-    Matrix m;
-    float taxis[3] = {0, 1, 0};
-    m.makeRotationMatrix(taxis, 2*PI/3);
-    RenderContext::getMutableContext()->modelviewMatrix.multiply(m);
-    RenderContext::getMutableContext()->applyModelviewMatrix();
-        testCube.render(renderMode);
-    RenderContext::getMutableContext()->modelviewMatrix.set(o);
-    m.makeRotationMatrix(taxis, -2*PI/3);
-    RenderContext::getMutableContext()->modelviewMatrix.multiply(m);
-    RenderContext::getMutableContext()->applyModelviewMatrix();
-        testCube.render(renderMode);
-    RenderContext::getMutableContext()->modelviewMatrix.set(o);
-*/
+    for (unsigned int i = 0; i < numRenderableObjs; i++)
+    {
+        if (renderableObjs[i] != NULL)
+            RenderObject(*renderableObjs[i]);
+    }
+
     RenderContext::getMutableContext()->setPositionHandle(VERTEX_HANDLE_NONE);
     RenderContext::getMutableContext()->setColorHandle(VERTEX_HANDLE_NONE);
 }
@@ -270,16 +311,14 @@ void RenderingEngine2::ApplyPerspective(float near, float far, float left, float
 {
     float a = 2*near/(right - left);
     float b = 2*near/(top - bottom);
-    float c = (right+left)/(right - left);
-    float d = (top+bottom)/(top - bottom);
-    float e = (far+ near)/(far - near);
-    float f = -2*far*near/(far - near);
+    float c = (far+ near)/(far - near);
+    float d = -2*far*near/(far - near);
 
     RenderContext::getMutableContext()->projectionMatrix.set(
         a,  0,  0,  0,
         0,  b,  0,  0,
-        c,  d,  e,  -1,
-        0,  0,  f,  1);
+        0,  0,  c,  d,
+        0,  0,  -1,  0);
 
     RenderContext::getMutableContext()->applyProjectionMatrix();
 }
@@ -362,7 +401,35 @@ void RenderingEngine2::onTouchMoved(int x, int y)
     if (numTouchMoves < TAP_MOVE_THRESHOLD)
         return;
 
-    if (useRollPitchYaw)
+    if (selectedPositionalObject == NULL)
+    {
+        RenderMode prevMode = renderMode;
+        renderMode = selection;
+        Render();
+        renderMode = prevMode;
+
+        IRenderable *selectedObject = IRenderable::findObjectById(RenderContext::getContext()->getSelectionIdAt(x, RenderContext::getContext()->getHeight()-y));
+        selectPositionalObject(dynamic_cast<PositionalObject*>(selectedObject));
+    }
+
+    if (selectedPositionalObject != NULL)
+    {
+        // TODO:: Need to project movement onto appropriate plane
+        selectedPositionalObject->MoveBy(((float)(touchX - x))/100.0, ((float)(touchY - y))/100.0, 0);
+    }
+    else if (true)
+    {
+        float dx = NORMALIZED_TOUCH_CHANGE_Y(y - touchY);
+        float dy = NORMALIZED_TOUCH_CHANGE_X(touchX - x);
+        testCube.RotateBy(dx, dy, 0);
+        for (unsigned int i = 0; i < 8; i++)
+        {
+            tc[i].RotateBy(dx, dy, 0);
+            dx = -dx;
+            dy = -dy;
+        }
+    }
+    else if (useRollPitchYaw)
     {
         pitch += NORMALIZED_TOUCH_CHANGE_Y(y - touchY);
         yaw += NORMALIZED_TOUCH_CHANGE_X(touchX - x);
@@ -381,6 +448,8 @@ void RenderingEngine2::onTouchEnd(int x, int y)
     if (!touchStarted)
         return;
 
+    deselectPositionalObject();
+
     if (numTouchMoves <= TAP_MOVE_THRESHOLD)
     {
         onTap(x, y);
@@ -393,11 +462,41 @@ void RenderingEngine2::onTouchEnd(int x, int y)
     touchStarted = false;
 }
 
+void RenderingEngine2::selectPositionalObject(PositionalObject *obj)
+{
+    selectedPositionalObject = obj;
+    Cube *c = dynamic_cast<Cube*>(obj);
+    if (c != NULL)
+        c->setColor(1, 0, 0);
+}
+
+void RenderingEngine2::deselectPositionalObject()
+{
+    Cube *c = dynamic_cast<Cube*>(selectedPositionalObject);
+    if (c != NULL)
+        c->setColor(0, 0, 1);
+    
+    selectedPositionalObject = NULL;
+}
+
 void RenderingEngine2::onTap(int x, int y)
 {
+    return;
     // TODO:: Get rid of this - only in place for validating 'onTap' logic
     renderMode = (renderMode == wireframe ? normal : wireframe);
     GetWorldCoordFromScreenCoord(x, y, 0);
+    if (x < 100)
+        testCube.MoveBy(-0.1, 0, 0);
+    else if (x > 220)
+        testCube.MoveBy(0.1, 0, 0);
+    else if (y < 150)
+        testCube.MoveBy(0, 0.1, 0);
+    else if (y > 330)
+        testCube.MoveBy(0, -0.1, 0);
+    else if (y < 240)
+        testCube.MoveBy(0, 0, -0.1);
+    else
+        testCube.MoveBy(0, 0, 0.1);
 }
 
 void RenderingEngine2::SetRoll(float rad)
