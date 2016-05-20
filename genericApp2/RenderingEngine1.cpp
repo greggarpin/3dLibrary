@@ -17,6 +17,19 @@ public:
     void Render() const;
     void UpdateAnimation(float timeStep) {}
     void OnRotate(DeviceOrientation orientation) {}
+    void Rotate(float xRadDelta, float yRadDelta, float zRadDelta) {};
+
+    void onTouchStart(int x, int y) {};
+    void onTouchMoved(int x, int y) {};
+    void onTouchEnd(int x, int y) {};
+    void SetRotation(float xRad, float yRad, float zRad);
+    void SetRotationX(float rad);
+    void SetRotationY(float rad);
+    void SetRotationZ(float rad);
+
+    void SetRoll(float rad);
+    void SetPitch(float rad);
+    void SetYaw(float rad);
 
 private:
     GLuint m_framebuffer;
@@ -83,3 +96,35 @@ void RenderingEngine1::Render() const
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
 }
+
+void RenderingEngine1::SetRotation(float xRad, float yRad, float zRad)
+{
+
+}
+
+void RenderingEngine1::SetRotationX(float rad)
+{
+
+}
+void RenderingEngine1::SetRotationY(float rad)
+{
+
+}
+void RenderingEngine1::SetRotationZ(float rad)
+{
+    
+}
+
+void RenderingEngine1::SetRoll(float rad)
+{
+
+}
+void RenderingEngine1::SetPitch(float rad)
+{
+
+}
+void RenderingEngine1::SetYaw(float rad)
+{
+
+}
+

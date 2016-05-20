@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include "Landscape.h"
+#include "RenderContext.h"
+
+#define NUM_VERTICES 1000
+#define NUM_DOME_VERTICES 6
+Landscape::Landscape() : gridVertices(NUM_VERTICES), domeVertices(NUM_DOME_VERTICES)
+{
+    const int max = NUM_VERTICES/8;
+    const float stepSize = 0.5;
+    const float range = stepSize * 20;
+    float step = 0;
+    for(int i = 0; i < max; )
+    {
+        gridVertices[i++].setPosition( step, 0, -range);
+        gridVertices[i++].setPosition( step, 0,  range);
+        gridVertices[i++].setPosition(-step, 0, -range);
+        gridVertices[i++].setPosition(-step, 0,  range);
+
+        gridVertices[i++].setPosition(-range, 0,  step);
+        gridVertices[i++].setPosition( range, 0,  step);
+        gridVertices[i++].setPosition(-range, 0, -step);
+        gridVertices[i++].setPosition( range, 0, -step);
+        
+        step += stepSize;
+    }
+
+    domeVertices[0].setPosition(0, range, 0);
+    domeVertices[1].setPosition(-range, 0, -range);
+    domeVertices[2].setPosition( range, 0, -range);
+    domeVertices[3].setPosition( range, 0,  range);
+    domeVertices[4].setPosition(-range, 0,  range);
+    domeVertices[5].setPosition(-range, 0, -range);
+    for(int i = 0; i < NUM_DOME_VERTICES; i++)
+    {
+        domeVertices[i].setColor(0.5, 0.5, 1.0);
+    }
+}
+
+const Landscape *Landscape::getLandscape()
+{
+    static Landscape *landscape = NULL;
+    if (landscape == NULL)
+    {
+        landscape = new Landscape();
+    }
+    return landscape;
+}
+
+void Landscape::render(RenderMode mode) const
+{
+    static bool firstVisit = true;
+    static GLushort indices[NUM_VERTICES];
+    if (firstVisit)
+    {
+        for (int i = 0; i < NUM_VERTICES; i++)
+            indices[i] = i;
+        firstVisit = false;
+    }
+
+    glVertexAttribPointer(RenderContext::getContext()->getPositionHandle(), 3, GL_FLOAT, GL_FALSE, gridVertices.getStride(), gridVertices.getPositionPointer());
+    glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, gridVertices.getStride(), gridVertices.getColorPointer());
+
+    glDrawElements(GL_LINES, NUM_VERTICES, GL_UNSIGNED_SHORT, indices);
+
+    glVertexAttribPointer(RenderContext::getContext()->getPositionHandle(), 3, GL_FLOAT, GL_FALSE, domeVertices.getStride(), domeVertices.getPositionPointer());
+    glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, domeVertices.getStride(), domeVertices.getColorPointer());
+
+    glDrawElements(GL_TRIANGLE_FAN, NUM_DOME_VERTICES, GL_UNSIGNED_SHORT, indices);
+}

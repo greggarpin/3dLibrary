@@ -11,40 +11,53 @@
 
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
+#include "Matrix.h"
+
+#define VERTEX_HANDLE_NONE -1
 
 class RenderContext
 {
 public:
-    static const RenderContext *getContext()
+    static RenderContext *getMutableContext()
     {
         return &rc;
     };
 
-    void setPositionHandle(GLuint handle)
+    static const RenderContext *getContext()
     {
-        positionHandle = handle;
-    };
-    GLuint getPositionHandle() const
-    {
-        return positionHandle;
+        return getMutableContext();
     };
 
-    void setColorHandle(GLuint handle)
-    {
-        colorHandle = handle;
-    };
-    GLuint getColorHandle() const
-    {
-        return colorHandle;
-    };
+    void setProgramHandle(GLuint program);
+    GLuint getProgramHandle() const;
+
+    void setPositionHandle(GLuint handle);
+    GLuint getPositionHandle() const;
+
+    void setColorHandle(GLuint handle);
+    GLuint getColorHandle() const;
+
+    void setWidth(int width);
+    int getWidth() const;
+
+    void setHeight(int height);
+    int getHeight() const;
 
     bool isValid() const;
+
+    void applyModelviewMatrix();
+
+    // TODO:: Need matrix stack
+    Matrix modelviewMatrix;
 private:
     // Singleton - no public constructor
     RenderContext() : positionHandle(0), colorHandle(0) {};
 
+    GLuint programHandle;
     GLuint positionHandle;
     GLuint colorHandle;
+
+    int width, height;
 
     static RenderContext rc;
 };

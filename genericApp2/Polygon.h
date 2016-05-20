@@ -17,11 +17,10 @@ public:
     Polygon();
     virtual ~Polygon();
 
-    void render() const;
+    void render(RenderMode mode) const;
 
 private:
-    Vertex *vertices;
-    unsigned int numVertices;
+    VertexList vertices;
 };
 
 #endif /* defined(__genericApp2__Polygon__) */

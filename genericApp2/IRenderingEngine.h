@@ -27,6 +27,19 @@ struct IRenderingEngine {
     virtual void Render() const = 0;
     virtual void UpdateAnimation(float timeStep) = 0;
     virtual void OnRotate(DeviceOrientation newOrientation) = 0;
+    virtual void Rotate(float deltaXRad, float deltaYRad, float deltaZRad) = 0;
+    virtual void SetRotation(float xRad, float yRad, float zRad) = 0;
+    virtual void SetRotationX(float rad) = 0;
+    virtual void SetRotationY(float rad) = 0;
+    virtual void SetRotationZ(float rad) = 0;
+    virtual void SetRoll(float rad) = 0;
+    virtual void SetPitch(float rad) = 0;
+    virtual void SetYaw(float rad) = 0;
+
+    virtual void onTouchStart(int x, int y) = 0;
+    virtual void onTouchMoved(int x, int y) = 0;
+    virtual void onTouchEnd(int x, int y) = 0;
+
     virtual ~IRenderingEngine() {}
 };
 #endif

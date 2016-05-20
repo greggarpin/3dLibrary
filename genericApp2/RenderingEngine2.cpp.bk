@@ -13,7 +13,6 @@
 #include "IRenderingEngine.h"
 #include "Polygon.h"
 #include "Cube.h"
-#include "Landscape.h"
 #include "RenderContext.h"
 #include "Matrix.h"
 #include "Util.h"
@@ -51,27 +50,12 @@ public:
             exit(1);
         }
     }
-    static ShaderProgram *GetActiveProgram()
-    {
-        return activeProgram;
-    }
-    void Use()
+    void Use() const
     {
         glUseProgram(progHandle);
-        RenderContext::getMutableContext()->setProgramHandle(progHandle);
-        ShaderProgram::activeProgram = this;
-    }
-    inline GLuint GetAttribLocation(const char *handleName)
-    {
-        return glGetAttribLocation(progHandle, handleName);
-    }
-    inline GLuint GetUniformLocation(const char *handleName)
-    {
-        return glGetUniformLocation(progHandle, handleName);
     }
 private:
     GLuint vertShaderHandle, fragShaderHandle, progHandle;
-    static ShaderProgram *activeProgram;
 
     GLuint BuildShader(const char *source, GLenum shaderType) const
     {
@@ -93,8 +77,6 @@ private:
 
 };
 
-ShaderProgram *ShaderProgram::activeProgram = NULL;
-
 class RenderingEngine2 : public IRenderingEngine {
 public:
     RenderingEngine2();
@@ -103,13 +85,6 @@ public:
     void UpdateAnimation(float timeStep) {}
     void OnRotate(DeviceOrientation orientation) {}
     void Rotate(float deltaXRad, float deltaYRad, float deltaZRad);
-    void SetRotation(float xRad, float yRad, float zRad);
-    void SetRotationX(float rad) { SetRotation(rad, yRot, zRot); };
-    void SetRotationY(float rad) { SetRotation(xRot, rad, zRot); };
-    void SetRotationZ(float rad) { SetRotation(xRot, yRot, rad); };
-    void SetRoll(float rad);
-    void SetPitch(float rad);
-    void SetYaw(float rad);
 
     void onTouchStart(int x, int y);
     void onTouchMoved(int x, int y);
@@ -123,13 +98,11 @@ private:
     void ApplyRotation() const;
     GLuint m_framebuffer;
     GLuint m_renderbuffer;
-    ShaderProgram normalProgram, selectionProgram;
+    GLuint m_simpleProgram;
+    GLuint m_selectionProgram;
     float xRot, yRot, zRot;
-    float roll, pitch, yaw;
-    bool useRollPitchYaw;
     int touchX, touchY;
     bool touchStarted;
-    float cameraPosition[3];
 
     Polygon testPolygon;
     Cube testCube;
@@ -154,13 +127,7 @@ RenderingEngine2::RenderingEngine2()
     glBindRenderbuffer(GL_RENDERBUFFER, m_renderbuffer);
 
     xRot = yRot = zRot = 0;
-    roll = pitch = yaw = 0;
     touchStarted = false;
-    useRollPitchYaw = true;
-
-    cameraPosition[0] = 0;
-    cameraPosition[1] = 48;
-    cameraPosition[0] = 0;
 }
 
 void RenderingEngine2::Initialize(int width, int height)
@@ -174,14 +141,14 @@ void RenderingEngine2::Initialize(int width, int height)
 
     glViewport(0, 0, width, height);
 
-    normalProgram.Build(SimpleVertexShader, SimpleFragmentShader);
-    selectionProgram.Build(SelectionVertexShader, SimpleFragmentShader);
+    m_simpleProgram = BuildProgram(SimpleVertexShader, SimpleFragmentShader);
+    m_selectionProgram = BuildProgram(SelectionVertexShader, SimpleFragmentShader);
 
-    selectionProgram.Use();
+    glUseProgram(m_selectionProgram);
     ApplyRotation();
     ApplyPerspective(-1, 10, -2, 2, -3, 3);
 
-    normalProgram.Use();
+    glUseProgram(m_simpleProgram);
 
     ApplyRotation();
 //    ApplyOrtho(2, 3);
@@ -190,28 +157,31 @@ void RenderingEngine2::Initialize(int width, int height)
 
 void RenderingEngine2::Render() const
 {
-    RenderMode renderMode = wireframe; // normal;
+    RenderMode renderMode = wireframe;
 
     GLuint positionSlot;
     GLuint colorSlot;
     if (renderMode == selection)
     {
+        positionSlot = glGetAttribLocation(m_selectionProgram, "Position");
+        colorSlot = glGetAttribLocation(m_selectionProgram, "SourceColor");
     }
-    positionSlot = ShaderProgram::GetActiveProgram()->GetAttribLocation("Position");
-    colorSlot = ShaderProgram::GetActiveProgram()->GetAttribLocation("SourceColor");
+    else
+    {
+        positionSlot = glGetAttribLocation(m_simpleProgram, "Position");
+        colorSlot = glGetAttribLocation(m_simpleProgram, "SourceColor");
+    }
 
-    glClearColor(0.2,0.2,0.2,1);
+    glClearColor(.6,0.6,0.6,1);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    ApplyRotation();
 
     RenderContext::getMutableContext()->setPositionHandle(positionSlot);
     RenderContext::getMutableContext()->setColorHandle(colorSlot);
 
-    Landscape::getLandscape()->render(renderMode);
-
-    ApplyRotation();
-
     testCube.render(renderMode);
-/*
+
     Matrix o(RenderContext::getContext()->modelviewMatrix);
     Matrix m;
     float taxis[3] = {0, 1, 0};
@@ -225,7 +195,7 @@ void RenderingEngine2::Render() const
     RenderContext::getMutableContext()->applyModelviewMatrix();
         testCube.render(renderMode);
     RenderContext::getMutableContext()->modelviewMatrix.set(o);
-*/
+
     RenderContext::getMutableContext()->setPositionHandle(VERTEX_HANDLE_NONE);
     RenderContext::getMutableContext()->setColorHandle(VERTEX_HANDLE_NONE);
 }
@@ -241,8 +211,7 @@ void RenderingEngine2::ApplyOrtho(float maxX, float maxY) const
                     0, 0, -1, 0,
                     0, 0, 0, 1);
 
-    GLint projectionUniform = ShaderProgram::GetActiveProgram()->GetUniformLocation("Projection");
-
+    GLint projectionUniform = glGetUniformLocation(m_simpleProgram, "Projection");
     glUniformMatrix4fv(projectionUniform, 1, 0, orthoMatrix.getPointer());
 }
 
@@ -262,7 +231,7 @@ void RenderingEngine2::ApplyPerspective(float near, float far, float left, float
         c,  d,  e,  -1,
         0,  0,  f,  1);
 
-    GLint projectionUniform = ShaderProgram::GetActiveProgram()->GetUniformLocation("Projection");
+    GLint projectionUniform = glGetUniformLocation(m_simpleProgram, "Projection");
     glUniformMatrix4fv(projectionUniform, 1, 0, projMatrix.getPointer());
 }
 
@@ -278,45 +247,24 @@ void RenderingEngine2::Rotate(float deltaXRad, float deltaYRad, float deltaZRad)
     CLAMP_RAD(zRot);
 }
 
-void RenderingEngine2::SetRotation(float xRad, float yRad, float zRad)
-{
-    xRot = xRad;
-    yRot = yRad;
-    zRot = zRad;
-}
-
 void RenderingEngine2::ApplyRotation() const
 {
-    Matrix m;
+    float xAxis []  = {1, 0, 0};
+    float yAxis []  = {0, 1, 0};
+    float zAxis []  = {0, 0, 1};
 
-    static float xAxis []  = {1, 0, 0};
-    static float yAxis []  = {0, 1, 0};
-    static float zAxis []  = {0, 0, 1};
+    Matrix m;
 
     RenderContext::getMutableContext()->modelviewMatrix.makeIdentityMatrix();
 
-    if (!useRollPitchYaw)
-    {
-        m.makeRotationMatrix(xAxis, xRot);
-        RenderContext::getMutableContext()->modelviewMatrix.multiply(m);
+    m.makeRotationMatrix(xAxis, xRot);
+    RenderContext::getMutableContext()->modelviewMatrix.multiply(m);
 
-        m.makeRotationMatrix(yAxis, yRot);
-        RenderContext::getMutableContext()->modelviewMatrix.multiply(m);
+    m.makeRotationMatrix(yAxis, yRot);
+    RenderContext::getMutableContext()->modelviewMatrix.multiply(m);
 
-        m.makeRotationMatrix(zAxis, zRot);
-        RenderContext::getMutableContext()->modelviewMatrix.multiply(m);
-    }
-    else
-    {
-        m.makeRotationMatrix(yAxis, yaw);
-        RenderContext::getMutableContext()->modelviewMatrix.multiply(m);
-
-        m.makeRotationMatrix(xAxis, pitch);
-        RenderContext::getMutableContext()->modelviewMatrix.multiply(m);
-
-        m.makeRotationMatrix(zAxis, roll);
-        RenderContext::getMutableContext()->modelviewMatrix.multiply(m);
-    }
+    m.makeRotationMatrix(zAxis, zRot);
+    RenderContext::getMutableContext()->modelviewMatrix.multiply(m);
 
     RenderContext::getMutableContext()->applyModelviewMatrix();
 }
@@ -337,15 +285,7 @@ void RenderingEngine2::onTouchMoved(int x, int y)
     if (!touchStarted)
         return;
 
-    if (useRollPitchYaw)
-    {
-        pitch += NORMALIZED_TOUCH_CHANGE_Y(y - touchY);
-        yaw += NORMALIZED_TOUCH_CHANGE_X(touchX - x);
-    }
-    else
-    {
-        Rotate(NORMALIZED_TOUCH_CHANGE_Y(y - touchY), NORMALIZED_TOUCH_CHANGE_X(touchX - x), 0);
-    }
+    Rotate(NORMALIZED_TOUCH_CHANGE_Y(y - touchY), NORMALIZED_TOUCH_CHANGE_X(touchX - x), 0);
 
     touchX = x;
     touchY = y;
@@ -361,20 +301,3 @@ void RenderingEngine2::onTouchEnd(int x, int y)
 
     touchStarted = false;
 }
-
-void RenderingEngine2::SetRoll(float rad)
-{
-    useRollPitchYaw = true;
-    roll = rad;
-}
-void RenderingEngine2::SetPitch(float rad)
-{
-    useRollPitchYaw = true;
-    pitch = rad;
-}
-void RenderingEngine2::SetYaw(float rad)
-{
-    useRollPitchYaw = true;
-    yaw = rad;
-}
-

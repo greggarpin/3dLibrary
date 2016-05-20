@@ -18,8 +18,13 @@
 
 - (id) initWithFrame:(CGRect)frame
 {
+    bool compassSupported = false;
+    bool accelerometerSupported = false;
     bool forceES1 = false;
+
     if (self = [super initWithFrame:frame]) {
+        self.multipleTouchEnabled = true;
+
         CAEAGLLayer *eaglLayer = (CAEAGLLayer*)super.layer;
         eaglLayer.opaque = YES;
 
@@ -58,6 +63,33 @@
         [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didRotate:) name:UIDeviceOrientationDidChangeNotification object:nil];
+
+        m_locationManager = [[CLLocationManager alloc] init];
+
+#if TARGET_IPHONE_SIMULATOR
+        compassSupported = false;
+        accelerometerSupported = false;
+#else
+        compassSupported = true;
+        accelerometerSupported = true;
+#endif // TARGET_IPHONE_SIMULATOR
+
+        if (compassSupported) {
+            m_locationManager.headingFilter = kCLHeadingFilterNone;
+            m_locationManager.delegate = self;
+            [m_locationManager startUpdatingHeading];
+        } else {
+            NSLog(@"Compass not supported");
+        }
+
+        if (accelerometerSupported) {
+            float updateFreq = 60;
+            m_accelFilter = [[LowpassFilter alloc] initWithSampleRate:updateFreq cutoffFrequency:5];
+            m_accelFilter.adaptive = true;
+
+            [[UIAccelerometer sharedAccelerometer] setUpdateInterval:1.0/updateFreq];
+            [[UIAccelerometer sharedAccelerometer] setDelegate:self];
+        }
     }
     NSLog(@"Initialized");
     return self;
@@ -95,5 +127,70 @@
 
     [m_context release];
     [super dealloc];
+}
+
+- (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UITouch* touch = [touches anyObject];
+    CGPoint location = [touch locationInView:self];
+#if TARGET_IPHONE_SIMULATOR
+    if (touches.count == 2)
+    {
+        m_renderingEngine->SetYaw(0);
+        m_renderingEngine->SetPitch(0);
+        m_renderingEngine->SetRoll(0);
+        return;
+    }
+#endif
+    m_renderingEngine->onTouchStart(location.x, location.y);
+}
+
+- (void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+#if TARGET_IPHONE_SIMULATOR
+    if (touches.count == 2)
+    {
+        return;
+    }
+#endif
+    UITouch* touch = [touches anyObject];
+    CGPoint location = [touch locationInView:self];
+
+    m_renderingEngine->onTouchMoved(location.x, location.y);
+}
+
+- (void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+#if TARGET_IPHONE_SIMULATOR
+    if (touches.count == 2)
+    {
+        return;
+    }
+#endif
+    UITouch* touch = [touches anyObject];
+    CGPoint location = [touch locationInView:self];
+
+    m_renderingEngine->onTouchEnd(location.x, location.y);
+}
+
+- (void) locationManager:(CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading
+{
+    float degrees = (float)newHeading.magneticHeading;
+//    NSLog(@"Compass degrees: %f", degrees);
+////    m_renderingEngine->SetRotationY(degrees*3.14159/180.0);
+    m_renderingEngine->SetYaw(degrees*3.14159/180.0);
+}
+
+- (void) accelerometer:(UIAccelerometer *)accelerometer didAccelerate:(UIAcceleration *)acceleration
+{
+    [m_accelFilter addAcceleration:acceleration];
+    float x = m_accelFilter.x;
+    float y = m_accelFilter.y;
+    float z = m_accelFilter.z;
+    float angle = atan2f(z, -y);
+//    NSLog(@"Received accelerometer: %f", angle);
+//    NSLog(@"Received accelerometer: \nX: %f  Y: %f  Z: %f", x, y, z);
+/////    m_renderingEngine->SetRotationX(-angle);
+    m_renderingEngine->SetPitch(angle);
 }
 @end
