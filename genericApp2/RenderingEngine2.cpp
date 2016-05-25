@@ -408,8 +408,13 @@ void RenderingEngine2::onTouchMoved(int x, int y)
         Render();
         renderMode = prevMode;
 
-        IRenderable *selectedObject = IRenderable::findObjectById(RenderContext::getContext()->getSelectionIdAt(x, RenderContext::getContext()->getHeight()-y));
-        selectPositionalObject(dynamic_cast<PositionalObject*>(selectedObject));
+        unsigned int selectedId = RenderContext::getContext()->getSelectionIdAt(x, RenderContext::getContext()->getHeight()-y);
+
+        if (selectedId != 0)
+        {
+            IRenderable *selectedObject = IRenderable::findObjectById(selectedId);
+            selectPositionalObject(dynamic_cast<PositionalObject*>(selectedObject));
+        }
     }
 
     if (selectedPositionalObject != NULL)

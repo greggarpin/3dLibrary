@@ -63,7 +63,7 @@ void RenderContext::setColorHandle(GLuint handle)
     colorHandle = handle;
 }
 
-#define intPartToFloat(intVal, bitShift) (((intVal >> bitShift) & 0x000000FF)/256.0)
+#define intPartToFloat(intVal, bitShift) (((intVal >> bitShift) & 0x000000FF)/255.0)
 
 void RenderContext::applySelectionId(unsigned int selectionId)
 {
@@ -81,10 +81,12 @@ void RenderContext::applySelectionId(unsigned int selectionId)
 
 unsigned int RenderContext::getSelectionIdAt(unsigned int x, unsigned int y) const
 {
-    GLbyte pixelColor[4] = {0, 0, 0, 0};
+    GLubyte pixelColor[4] = {0, 0, 0, 0};
     glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixelColor);
 
-    return (pixelColor[0] | (pixelColor[1] << 8) | (pixelColor[2] << 16));
+    unsigned int retVal = (pixelColor[0] | (pixelColor[1] << 8) | (pixelColor[2] << 16));
+    
+    return retVal;
 }
 
 void RenderContext::applyModelviewMatrix()

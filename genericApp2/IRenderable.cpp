@@ -5,9 +5,23 @@ IRenderable *IRenderable::list = NULL;
 
 IRenderable::IRenderable() : next(NULL)
 {
-    static unsigned idIndex = 0;
+    static unsigned idIndex = 1;
     renderableId = idIndex++;
-
+/*
+    // Useful for visually debugging selection mode
+    static int tester = -1;
+    if (tester == 0)
+        renderableId = 128;
+    else if(tester ==1)
+        renderableId = 255; // full red
+    else if(tester ==2)
+        renderableId = 255*256; // full green
+    else if(tester ==3)
+        renderableId = 256*256*255; // full blue
+    else if(tester ==4)
+        renderableId = 128*256*256 + 128*256 + 128; // 50% white
+    tester++;
+*/
     registerRenderable(this);
 }
 
