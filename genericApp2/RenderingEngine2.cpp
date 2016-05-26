@@ -412,6 +412,9 @@ void RenderingEngine2::onTouchMoved(int x, int y)
 
         if (selectedId != 0)
         {
+            LOG("SelectedId = ");
+            LOG(selectedId);
+
             IRenderable *selectedObject = IRenderable::findObjectById(selectedId);
             selectPositionalObject(dynamic_cast<PositionalObject*>(selectedObject));
         }
