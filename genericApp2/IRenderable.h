@@ -6,6 +6,7 @@
 enum RenderMode {
     normal,
     wireframe,
+    solidWireframe,
     selection
 };
 

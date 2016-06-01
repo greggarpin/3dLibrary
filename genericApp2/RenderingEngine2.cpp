@@ -124,6 +124,7 @@ private:
     void ApplyOrtho(float maxX, float maxY) const;
     void ApplyPerspective(float near, float far, float left, float right, float top, float bottom);
     void ApplyRotation() const;
+    void InitializeCameraMatrix() const;
     Vertex GetViewDirection() const;
     void GetWorldCoordFromScreenCoord(int screenX, int screenY, float worldHeight) const;
     void RenderObject(const IRenderable &obj) const;
@@ -187,7 +188,7 @@ RenderingEngine2::RenderingEngine2() : numRenderableObjs(0), selectedPositionalO
     useRollPitchYaw = true;
 
     cameraPosition[0] = 0;
-    cameraPosition[1] = 48;
+    cameraPosition[1] = 5;
     cameraPosition[0] = 0;
 
     renderableObjs = new IRenderable*[numRenderableObjs++];
@@ -205,7 +206,8 @@ RenderingEngine2::RenderingEngine2() : numRenderableObjs(0), selectedPositionalO
 //    tc[i++].SetPosition(-1, 1, 3);
     for (unsigned int i = 0; i < 8; i++)
     {
-        renderableObjs[numRenderableObjs++] = &tc[i];
+        tc[i].SetPosition(0, 0, i-4);
+//        renderableObjs[numRenderableObjs++] = &tc[i];
     }
 
     testCube.SetPosition(0, 0, 2);
@@ -247,7 +249,7 @@ void RenderingEngine2::Initialize(int width, int height)
     ApplyPerspective(1, 10, -2, 2, -3, 3);
 }
 
-RenderMode renderMode = normal;
+RenderMode renderMode = solidWireframe;
 
 void RenderingEngine2::RenderObject(const IRenderable &obj) const
 {
@@ -280,9 +282,9 @@ void RenderingEngine2::Render() const
     RenderContext::getMutableContext()->setPositionHandle(positionSlot);
     RenderContext::getMutableContext()->setColorHandle(colorSlot);
 
-   /// Landscape::getLandscape()->render(renderMode);
+    InitializeCameraMatrix();
 
-    ApplyRotation();
+    Landscape::getLandscape()->render(renderMode);
 
     for (unsigned int i = 0; i < numRenderableObjs; i++)
     {
@@ -292,6 +294,13 @@ void RenderingEngine2::Render() const
 
     RenderContext::getMutableContext()->setPositionHandle(VERTEX_HANDLE_NONE);
     RenderContext::getMutableContext()->setColorHandle(VERTEX_HANDLE_NONE);
+}
+
+void RenderingEngine2::InitializeCameraMatrix() const
+{
+    RenderContext::getMutableContext()->modelviewMatrix.makeTranslationMatrix(-cameraPosition[0], -cameraPosition[1], -cameraPosition[2]);
+    RenderContext::getMutableContext()->applyModelviewMatrix();
+    ApplyRotation();
 }
 
 void RenderingEngine2::ApplyOrtho(float maxX, float maxY) const
@@ -350,7 +359,7 @@ void RenderingEngine2::ApplyRotation() const
     static float yAxis []  = {0, 1, 0};
     static float zAxis []  = {0, 0, 1};
 
-    RenderContext::getMutableContext()->modelviewMatrix.makeIdentityMatrix();
+ //   RenderContext::getMutableContext()->modelviewMatrix.makeIdentityMatrix();
 
     if (!useRollPitchYaw)
     {
@@ -425,7 +434,7 @@ void RenderingEngine2::onTouchMoved(int x, int y)
         // TODO:: Need to project movement onto appropriate plane
         selectedPositionalObject->MoveBy(((float)(touchX - x))/100.0, ((float)(touchY - y))/100.0, 0);
     }
-    else if (true)
+    else if (false)
     {
         float dx = NORMALIZED_TOUCH_CHANGE_Y(y - touchY);
         float dy = NORMALIZED_TOUCH_CHANGE_X(touchX - x);
@@ -489,10 +498,6 @@ void RenderingEngine2::deselectPositionalObject()
 
 void RenderingEngine2::onTap(int x, int y)
 {
-    return;
-    // TODO:: Get rid of this - only in place for validating 'onTap' logic
-    renderMode = (renderMode == wireframe ? normal : wireframe);
-    GetWorldCoordFromScreenCoord(x, y, 0);
     if (x < 100)
         testCube.MoveBy(-0.1, 0, 0);
     else if (x > 220)
@@ -505,6 +510,8 @@ void RenderingEngine2::onTap(int x, int y)
         testCube.MoveBy(0, 0, -0.1);
     else
         testCube.MoveBy(0, 0, 0.1);
+    LOG("Position.Z");
+    LOG(testCube.GetPosition().getZ());
 }
 
 void RenderingEngine2::SetRoll(float rad)

@@ -40,14 +40,17 @@ Cube::~Cube()
 void Cube::render(RenderMode mode) const
 {
     glVertexAttribPointer(RenderContext::getContext()->getPositionHandle(), 3, GL_FLOAT, GL_FALSE, vertices.getStride(), vertices.getPositionPointer());
-    glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, vertices.getStride(), vertices.getColorPointer());
 
-    if (mode == wireframe) {
+    if (mode == wireframe || mode == solidWireframe) {
+        static GLfloat blackColor [] = {0,0,0,1};
+        glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, 0, blackColor);
+
         static GLushort wireframeIndices [] = {0, 1, 3, 2, 0, 4, 5, 7, 6, 4, 0, 2, 6, 7, 3, 1, 5};
 
         glDrawElements(GL_LINE_STRIP, 17, GL_UNSIGNED_SHORT, wireframeIndices);
     }
-    else
+
+    if (mode != wireframe)
     {
         static GLushort solidIndices [] = { 4, 5, 7,
                                             4, 7, 6,
@@ -62,6 +65,7 @@ void Cube::render(RenderMode mode) const
                                             1, 5, 4,
                                             0, 1, 4
                                             };
+        glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, vertices.getStride(), vertices.getColorPointer());
         glDrawElements(GL_TRIANGLES, sizeof(solidIndices)/sizeof(GLushort), GL_UNSIGNED_SHORT, solidIndices);
     }
 }
