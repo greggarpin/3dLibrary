@@ -194,23 +194,18 @@ RenderingEngine2::RenderingEngine2() : numRenderableObjs(0), selectedPositionalO
     renderableObjs = new IRenderable*[numRenderableObjs++];
     renderableObjs[0] = &testCube;
     int i = 0;
-    tc[i++].SetPosition(-3, 3, 3);
-    tc[i++].SetPosition( 3, 3, 3);
-    tc[i++].SetPosition(-3, -3, 3);
-    tc[i++].SetPosition( 3, -3, 3);
-    tc[i++].SetPosition(-8, 8, 7);
-    tc[i++].SetPosition(-8, -8, 7);
-    tc[i++].SetPosition( 8, -8, 7);
-    tc[i++].SetPosition( 8, 8, 7);
-//    tc[i++].SetPosition(-1, 1, 3);
-//    tc[i++].SetPosition(-1, 1, 3);
-    for (unsigned int i = 0; i < 8; i++)
+    tc[i++].SetPosition(-3, 0, -2);
+    tc[i++].SetPosition( 3, 0, -2);
+    tc[i++].SetPosition(0, -3, -2);
+    tc[i++].SetPosition(0,  3, -2);
+    tc[i++].SetPosition(0, 0, -3);
+    tc[i++].SetPosition(0, 0,  3);
+    for (unsigned int j = 0; j < i; j++)
     {
-        tc[i].SetPosition(0, 0, i-4);
-//        renderableObjs[numRenderableObjs++] = &tc[i];
+        renderableObjs[numRenderableObjs++] = &tc[j];
     }
 
-    testCube.SetPosition(0, 0, 2);
+    testCube.SetPosition(0, 0, -2);
     testCube.SetRotation(0, PI/6, 0);
 }
 
@@ -298,7 +293,7 @@ void RenderingEngine2::Render() const
 
 void RenderingEngine2::InitializeCameraMatrix() const
 {
-    RenderContext::getMutableContext()->modelviewMatrix.makeTranslationMatrix(-cameraPosition[0], -cameraPosition[1], -cameraPosition[2]);
+    RenderContext::getMutableContext()->modelviewMatrix.makeTranslationMatrix(cameraPosition[0], cameraPosition[1], cameraPosition[2]);
     RenderContext::getMutableContext()->applyModelviewMatrix();
     ApplyRotation();
 }
@@ -318,9 +313,12 @@ void RenderingEngine2::ApplyOrtho(float maxX, float maxY) const
 
 void RenderingEngine2::ApplyPerspective(float near, float far, float left, float right, float top, float bottom)
 {
-    float a = 2*near/(right - left);
-    float b = 2*near/(top - bottom);
-    float c = (far+ near)/(far - near);
+    assert(left == -right);
+    assert(top == -bottom);
+// Still a problem for point.z == 0 (and subsequent points that straddle the line)
+    float a = near/right;
+    float b = near/top;
+    float c = -(far + near)/(far - near);
     float d = -2*far*near/(far - near);
 
     RenderContext::getMutableContext()->projectionMatrix.set(
@@ -432,7 +430,7 @@ void RenderingEngine2::onTouchMoved(int x, int y)
     if (selectedPositionalObject != NULL)
     {
         // TODO:: Need to project movement onto appropriate plane
-        selectedPositionalObject->MoveBy(((float)(touchX - x))/100.0, ((float)(touchY - y))/100.0, 0);
+        selectedPositionalObject->MoveBy(((float)(x - touchX))/100.0, ((float)(y - touchY))/100.0, 0);
     }
     else if (false)
     {

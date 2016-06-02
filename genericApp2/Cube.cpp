@@ -29,8 +29,9 @@ Cube::Cube() : vertices(8)
     vertices[5].setColor(1, 0, 1);
     vertices[6].setColor(1, 0.5, .5);
     vertices[7].setColor(1, .33, .67);
- */
+ /*/
     setColor(0, 0, 1);
+//*/
 }
 
 Cube::~Cube()
@@ -41,7 +42,8 @@ void Cube::render(RenderMode mode) const
 {
     glVertexAttribPointer(RenderContext::getContext()->getPositionHandle(), 3, GL_FLOAT, GL_FALSE, vertices.getStride(), vertices.getPositionPointer());
 
-    if (mode == wireframe || mode == solidWireframe) {
+    if (mode == wireframe || mode == solidWireframe)
+    {
         static GLfloat blackColor [] = {0,0,0,1};
         glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, 0, blackColor);
 
@@ -52,18 +54,19 @@ void Cube::render(RenderMode mode) const
 
     if (mode != wireframe)
     {
-        static GLushort solidIndices [] = { 4, 5, 7,
-                                            4, 7, 6,
-                                            1, 0, 2,
-                                            3, 1, 2,
-                                            5, 1, 3,
-                                            7, 5, 3,
-                                            0, 4, 6,
-                                            2, 0, 6,
-                                            2, 6, 7,
-                                            3, 2, 7,
-                                            1, 5, 4,
-                                            0, 1, 4
+        static GLushort solidIndices [] = {
+                                            7, 5, 4,
+                                            6, 7, 4,
+                                            2, 0, 1,
+                                            2, 1, 3,
+                                            3, 1, 5,
+                                            3, 5, 7,
+                                            6, 4, 0,
+                                            6, 0, 2,
+                                            7, 6, 2,
+                                            7, 2, 3,
+                                            4, 5, 1,
+                                            4, 1, 0
                                             };
         glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, vertices.getStride(), vertices.getColorPointer());
         glDrawElements(GL_TRIANGLES, sizeof(solidIndices)/sizeof(GLushort), GL_UNSIGNED_SHORT, solidIndices);
