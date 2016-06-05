@@ -9,13 +9,14 @@ uniform vec4 SelectionId;
 
 void main(void)
 {
+    gl_PointSize = 5.0;
     if (SelectionId != vec4(0,0,0,0))
         DestinationColor = SelectionId;
     else
         DestinationColor = SourceColor;
 
     vec4 ans = Projection * Modelview * Position;
-    ans /= ans.w;
+    
     gl_Position = ans;
     return;
 

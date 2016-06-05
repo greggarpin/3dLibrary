@@ -96,9 +96,9 @@ void Landscape::render(RenderMode mode) const
     glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, cellarVertices.getStride(), cellarVertices.getColorPointer());
 
     glDrawElements(GL_TRIANGLE_FAN, NUM_DOME_VERTICES, GL_UNSIGNED_SHORT, indices);
-*/
+//*/
     glVertexAttribPointer(RenderContext::getContext()->getPositionHandle(), 3, GL_FLOAT, GL_FALSE, gridVertices.getStride(), gridVertices.getPositionPointer());
     glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, gridVertices.getStride(), gridVertices.getColorPointer());
 
-    glDrawElements(GL_LINES, NUM_VERTICES, GL_UNSIGNED_SHORT, indices);
+  glDrawElements(GL_LINES, NUM_VERTICES, GL_UNSIGNED_SHORT, indices);
 }
