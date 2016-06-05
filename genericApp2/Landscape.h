@@ -3,7 +3,7 @@
 
 #include "IRenderable.h"
 
-class Landscape
+class Landscape : public IRenderable
 {
 public:
 
@@ -15,7 +15,6 @@ private:
     Landscape();
 
     VertexList gridVertices;
-    VertexList domeVertices;
     VertexList cellarVertices;
 };
 
