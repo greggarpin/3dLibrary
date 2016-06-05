@@ -22,7 +22,6 @@
 
 #define STRINGIFY(A) #A
 #include "shaders/Simple.vert"
-#include "shaders/Selection.vert"
 #include "shaders/Simple.frag"
 
 class ShaderProgram {
@@ -133,7 +132,7 @@ private:
     GLuint m_framebuffer;
     GLuint m_renderbuffer;
     GLuint m_depthbuffer;
-    ShaderProgram normalProgram, selectionProgram;
+    ShaderProgram normalProgram;
     float xRot, yRot, zRot;
     float roll, pitch, yaw;
     bool useRollPitchYaw;
@@ -231,11 +230,6 @@ void RenderingEngine2::Initialize(int width, int height)
     glViewport(0, 0, width, height);
 
     normalProgram.Build(SimpleVertexShader, SimpleFragmentShader);
-    selectionProgram.Build(SelectionVertexShader, SimpleFragmentShader);
-
-    selectionProgram.Use();
-    ApplyRotation();
-    ApplyPerspective(1, 10, -2, 2, -3, 3);
 
     normalProgram.Use();
 
