@@ -121,7 +121,7 @@ private:
     GLuint BuildShader(const char *source, GLenum shaderType) const;
     GLuint BuildProgram(const char *vertShader, const char *fragShader) const;
     void ApplyOrtho(float maxX, float maxY) const;
-    void ApplyPerspective(float near, float far, float left, float right, float top, float bottom);
+    void ApplyPerspective(float near, float far, float left, float right, float bottom, float top);
     void ApplyRotation() const;
     void InitializeCameraMatrix() const;
     Vertex GetViewDirection() const;
@@ -201,7 +201,7 @@ RenderingEngine2::RenderingEngine2() : numRenderableObjs(0), selectedPositionalO
     tc[i++].SetPosition(0, 0,  3);
     for (unsigned int j = 0; j < i; j++)
     {
-        ///renderableObjs[numRenderableObjs++] = &tc[j];
+        renderableObjs[numRenderableObjs++] = &tc[j];
     }
 
     testCube.SetPosition(0, 0, -2);
@@ -288,7 +288,7 @@ void RenderingEngine2::Render() const
             RenderObject(*renderableObjs[i]);
     }
     if (testRotation)
-        testCube.RotateBy(0.01, 0, 0);
+        testCube.RotateBy(0.01, 0.01, 0);
     RenderContext::getMutableContext()->setPositionHandle(VERTEX_HANDLE_NONE);
     RenderContext::getMutableContext()->setColorHandle(VERTEX_HANDLE_NONE);
     RenderContext::getMutableContext()->setNormalHandle(VERTEX_HANDLE_NONE);
@@ -296,7 +296,7 @@ void RenderingEngine2::Render() const
 
 void RenderingEngine2::InitializeCameraMatrix() const
 {
-    RenderContext::getMutableContext()->modelviewMatrix.makeTranslationMatrix(cameraPosition[0], cameraPosition[1], cameraPosition[2]);
+    RenderContext::getMutableContext()->modelviewMatrix.makeTranslationMatrix(-cameraPosition[0], -cameraPosition[1], -cameraPosition[2]);
     RenderContext::getMutableContext()->applyModelviewMatrix();
     ApplyRotation();
 }
@@ -314,7 +314,7 @@ void RenderingEngine2::ApplyOrtho(float maxX, float maxY) const
     RenderContext::getMutableContext()->applyProjectionMatrix();
 }
 
-void RenderingEngine2::ApplyPerspective(float near, float far, float left, float right, float top, float bottom)
+void RenderingEngine2::ApplyPerspective(float near, float far, float left, float right, float bottom, float top)
 {
     assert(left == -right);
     assert(top == -bottom);

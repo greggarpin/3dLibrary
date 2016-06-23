@@ -39,18 +39,19 @@ Cube::Cube() : vertices(24)
     vertices[v].setPosition( size,  size,  size); vertices[v++].setNormal(1, 0, 0);
 
     // Bottom face
-    vertices[v].setPosition(-size, -size, -size); vertices[v++].setNormal(0, 1, 0);
-    vertices[v].setPosition(-size, -size,  size); vertices[v++].setNormal(0, 1, 0);
-    vertices[v].setPosition( size, -size,  size); vertices[v++].setNormal(0, 1, 0);
-    vertices[v].setPosition( size, -size, -size); vertices[v++].setNormal(0, 1, 0);
+    vertices[v].setPosition(-size, -size, -size); vertices[v++].setNormal(0, -1, 0);
+    vertices[v].setPosition(-size, -size,  size); vertices[v++].setNormal(0, -1, 0);
+    vertices[v].setPosition( size, -size,  size); vertices[v++].setNormal(0, -1, 0);
+    vertices[v].setPosition( size, -size, -size); vertices[v++].setNormal(0, -1, 0);
 
     // Top face
-    vertices[v].setPosition( size,  size, -size); vertices[v++].setNormal(0, -1, 0);
-    vertices[v].setPosition( size,  size,  size); vertices[v++].setNormal(0, -1, 0);
-    vertices[v].setPosition(-size,  size,  size); vertices[v++].setNormal(0, -1, 0);
-    vertices[v].setPosition(-size,  size, -size); vertices[v++].setNormal(0, -1, 0);
+    vertices[v].setPosition( size,  size, -size); vertices[v++].setNormal(0, 1, 0);
+    vertices[v].setPosition( size,  size,  size); vertices[v++].setNormal(0, 1, 0);
+    vertices[v].setPosition(-size,  size,  size); vertices[v++].setNormal(0, 1, 0);
+    vertices[v].setPosition(-size,  size, -size); vertices[v++].setNormal(0, 1, 0);
 
     setColor(0, 0, 1);
+/* // Color back face
     vertices[0].setColor(1, 0, 0);
     vertices[1].setColor(1, 0, 0);
     vertices[2].setColor(1, 0, 0);
@@ -63,6 +64,7 @@ Cube::Cube() : vertices(24)
     vertices[19].setColor(1, 0, 0);
     vertices[20].setColor(1, 0, 0);
     vertices[23].setColor(1, 0, 0);
+ */
 }
 
 Cube::~Cube()
@@ -90,28 +92,28 @@ void Cube::render(RenderMode mode) const
     {
         static GLushort solidIndices [] = {
                                             // Back face
-                                            0, 1, 2,
-                                            0, 2, 3,
+                                            2, 1, 0,
+                                            3, 2, 0,
 
                                             // Front face
-                                            4, 5, 6,
-                                            4, 6, 7,
+                                            6, 5, 4,
+                                            7, 6, 4,
 
                                             // Left face
-                                            8, 9, 10,
-                                            8, 10, 11,
+                                            10, 9, 8,
+                                            11, 10, 8,
 
                                             // Right face
-                                            12, 13, 14,
-                                            12, 14, 15,
+                                            14, 13, 12,
+                                            15, 14, 12,
 
                                             // Bottom face
-                                            16, 17, 18,
-                                            16, 18, 19,
+                                            18, 17, 16,
+                                            19, 18, 16,
 
                                             // Top face
-                                            20, 21, 22,
-                                            20, 22, 23
+                                            22, 21, 20,
+                                            23, 22, 20
                                             };
 
         RenderContext::getContext()->enableLighting();

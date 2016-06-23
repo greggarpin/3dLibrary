@@ -28,7 +28,7 @@ void main(void)
         mat3 normalModelView3 = mat3(NormalModelview);
         DestinationNormal = normalModelView3 * Normal;
     }
-    // Looks like the normal is being rotated backwards relative to the object...
+
     gl_Position = Projection * Modelview * Position;
 });
 

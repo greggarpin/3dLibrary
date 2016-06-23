@@ -71,5 +71,7 @@ void Landscape::render(RenderMode mode) const
     glVertexAttribPointer(RenderContext::getContext()->getPositionHandle(), 3, GL_FLOAT, GL_FALSE, gridVertices.getStride(), gridVertices.getPositionPointer());
     glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, gridVertices.getStride(), gridVertices.getColorPointer());
 
+    RenderContext::getContext()->disableLighting();
+
     glDrawElements(GL_LINES, gridVertices.getNumVertices(), GL_UNSIGNED_SHORT, indices);
 }
