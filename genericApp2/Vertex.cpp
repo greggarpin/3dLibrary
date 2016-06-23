@@ -14,12 +14,14 @@
 // TODO:: Need a separation between Vector and Vertex concepts.  This munges them together
 Vertex::Vertex() : Vector(0, 0, 0)
 {
-    color[0] = color[1] = color[2] = color[3] = 1;
+    setColor(1, 1, 1, 1);
+    setNormal(0, 1, 0);
 }
 
 Vertex::Vertex(float x, float y, float z) : Vector(x, y, z)
 {
-    color[0] = color[1] = color[2] = color[3] = 1;
+    setColor(1, 1, 1, 1);
+    setNormal(0, 1, 0);
 }
 
 void Vertex::setPosition(float x, float y, float z)
@@ -35,14 +37,20 @@ void Vertex::setColor(float r, float g, float b, float a)
     color[3] = a;
 }
 
+void Vertex::setNormal(float x, float y, float z)
+{
+    normal[0] = x;
+    normal[1] = y;
+    normal[2] = z;
+}
+
 Vertex& Vertex::operator=(const Vertex &v)
 {
     set(v.getX(), v.getY(), v.getZ());
 
-    color[0] = v.color[0];
-    color[1] = v.color[1];
-    color[2] = v.color[2];
-    color[3] = v.color[3];
+    setColor(v.color[0], v.color[1], v.color[2], v.color[3]);
+
+    setNormal(v.normal[0], v.normal[1], v.normal[2]);
 
     return *this;
 }
@@ -95,6 +103,11 @@ float * VertexList::getPositionPointer() const
 float * VertexList::getColorPointer() const
 {
     return vertices[0].color;
+}
+
+float * VertexList::getNormalPointer() const
+{
+    return vertices[0].normal;
 }
 
 unsigned int VertexList::getStride() const

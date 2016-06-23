@@ -53,6 +53,7 @@ void Landscape::render(RenderMode mode) const
 {
     static bool firstVisit = true;
     static GLushort indices[NUM_VERTICES];
+    static float nullnormal[3] = {0, 0, 0};
     if (firstVisit)
     {
         for (int i = 0; i < NUM_VERTICES; i++)
@@ -62,6 +63,8 @@ void Landscape::render(RenderMode mode) const
 
     glVertexAttribPointer(RenderContext::getContext()->getPositionHandle(), 3, GL_FLOAT, GL_FALSE, cellarVertices.getStride(), cellarVertices.getPositionPointer());
     glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, cellarVertices.getStride(), cellarVertices.getColorPointer());
+// TODO:: Poor man's way to disable normal - set to 0,0,0 here, then check the value on the shader side.  Really need to have separate shader
+    glVertexAttribPointer(RenderContext::getContext()->getNormalHandle(), 3, GL_FLOAT, GL_FALSE, 0, nullnormal);
 
     glDrawElements(GL_TRIANGLE_FAN, cellarVertices.getNumVertices(), GL_UNSIGNED_SHORT, indices);
 

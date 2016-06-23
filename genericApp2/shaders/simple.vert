@@ -2,37 +2,33 @@ const char* SimpleVertexShader = STRINGIFY(
 
 attribute vec4 Position;
 attribute vec4 SourceColor;
+attribute vec3 Normal;
 varying vec4 DestinationColor;
+varying lowp vec3 DestinationNormal;
+varying lowp float bRenderLighting;
 uniform mat4 Projection;
 uniform mat4 Modelview;
 uniform vec4 SelectionId;
+uniform mat4 NormalModelview;
+uniform float EnableLighting;
 
 void main(void)
 {
-    gl_PointSize = 5.0;
-    if (SelectionId != vec4(0,0,0,0))
+////    gl_PointSize = 5.0;
+    if (SelectionId != vec4(0,0,0,0) || EnableLighting == 0.0)
+    {
         DestinationColor = SelectionId;
+        bRenderLighting = 0.0;
+    }
     else
+    {
         DestinationColor = SourceColor;
+        bRenderLighting = 1.0;
 
-    vec4 ans = Projection * Modelview * Position;
-    
-    gl_Position = ans;
-    return;
-
-    vec4 legit;
-
-    if (Position == vec4(-0.5, -0.5, -0.5, 1))      legit = vec4(.166666, -.111111, .259259, 1);
-    else if (Position == vec4( 0.5, -0.5, -0.5, 1)) legit = vec4(-.166666, -.111111, .259259, 1);
-    else if (Position == vec4(-0.5,  0.5, -0.5, 1)) legit = vec4(.166666, .111111, .259259, 1);
-    else if (Position == vec4( 0.5,  0.5, -0.5, 1)) legit = vec4(-.166666, .111111, .259259, 1);
-    else if (Position == vec4(-0.5, -0.5,  0.5, 1)) legit = vec4( .1, -.0666666, -.3333333, 1);
-    else if (Position == vec4( 0.5, -0.5,  0.5, 1)) legit = vec4(-.1, -.0666666, -.3333333, 1);
-    else if (Position == vec4(-0.5,  0.5,  0.5, 1)) legit = vec4( .1, .0666666, -.3333333, 1);
-    else if (Position == vec4( 0.5,  0.5,  0.5, 1)) legit = vec4(-.1, .0666666, -.3333333, 1);
-    else
-        legit = vec4(0,0,0,1);
-
-    gl_Position = legit;
+        mat3 normalModelView3 = mat3(NormalModelview);
+        DestinationNormal = normalModelView3 * Normal;
+    }
+    // Looks like the normal is being rotated backwards relative to the object...
+    gl_Position = Projection * Modelview * Position;
 });
 

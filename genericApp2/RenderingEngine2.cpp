@@ -142,7 +142,7 @@ private:
     float cameraPosition[3];
 
     Polygon testPolygon;
-    Cube testCube;
+mutable    Cube testCube;
     Cube tc[10];
     IRenderable **renderableObjs;
     unsigned int numRenderableObjs;
@@ -201,11 +201,11 @@ RenderingEngine2::RenderingEngine2() : numRenderableObjs(0), selectedPositionalO
     tc[i++].SetPosition(0, 0,  3);
     for (unsigned int j = 0; j < i; j++)
     {
-        renderableObjs[numRenderableObjs++] = &tc[j];
+        ///renderableObjs[numRenderableObjs++] = &tc[j];
     }
 
     testCube.SetPosition(0, 0, -2);
-    testCube.SetRotation(0, PI/6, 0);
+    testCube.SetRotation(PI/2, 0, 0);
 }
 
 void RenderingEngine2::Initialize(int width, int height)
@@ -239,7 +239,7 @@ void RenderingEngine2::Initialize(int width, int height)
 }
 
 RenderMode renderMode = solidWireframe;
-
+bool testRotation = false;
 void RenderingEngine2::RenderObject(const IRenderable &obj) const
 {
     obj.PreRender(renderMode);
@@ -252,11 +252,13 @@ void RenderingEngine2::Render() const
 
     GLuint positionSlot;
     GLuint colorSlot;
+    GLuint normalSlot;
     if (renderMode == selection)
     {
     }
     positionSlot = ShaderProgram::GetActiveProgram()->GetAttribLocation("Position");
     colorSlot = ShaderProgram::GetActiveProgram()->GetAttribLocation("SourceColor");
+    normalSlot = ShaderProgram::GetActiveProgram()->GetAttribLocation("Normal");
 
     if (renderMode == selection)
     {
@@ -270,6 +272,11 @@ void RenderingEngine2::Render() const
 
     RenderContext::getMutableContext()->setPositionHandle(positionSlot);
     RenderContext::getMutableContext()->setColorHandle(colorSlot);
+    RenderContext::getMutableContext()->setNormalHandle(normalSlot);
+
+    RenderContext::getMutableContext()->enableLighting();
+    RenderContext::getMutableContext()->applyLightColor(1, 1, 1);
+    RenderContext::getMutableContext()->applyLightPosition(1, 1, 1, true);
 
     InitializeCameraMatrix();
 
@@ -280,9 +287,11 @@ void RenderingEngine2::Render() const
         if (renderableObjs[i] != NULL)
             RenderObject(*renderableObjs[i]);
     }
-
+    if (testRotation)
+        testCube.RotateBy(0.01, 0, 0);
     RenderContext::getMutableContext()->setPositionHandle(VERTEX_HANDLE_NONE);
     RenderContext::getMutableContext()->setColorHandle(VERTEX_HANDLE_NONE);
+    RenderContext::getMutableContext()->setNormalHandle(VERTEX_HANDLE_NONE);
 }
 
 void RenderingEngine2::InitializeCameraMatrix() const
@@ -490,6 +499,8 @@ void RenderingEngine2::deselectPositionalObject()
 
 void RenderingEngine2::onTap(int x, int y)
 {
+    testRotation = !testRotation;
+    return;
     if (x < 100)
         testCube.MoveBy(-0.1, 0, 0);
     else if (x > 220)

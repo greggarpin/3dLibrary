@@ -40,6 +40,9 @@ public:
     void setColorHandle(GLuint handle);
     GLuint getColorHandle() const;
 
+    void setNormalHandle(GLuint handle);
+    GLuint getNormalHandle() const;
+
     void setWidth(int width);
     int getWidth() const;
 
@@ -51,6 +54,11 @@ public:
     void applyModelviewMatrix();
     void applyProjectionMatrix();
     void applySelectionId(unsigned int selectionId);
+    void applyLightColor(float r, float g, float b) const;
+    void applyLightPosition(float x, float y, float z, bool normalize) const;
+
+    void enableLighting(bool enable = true) const;
+    void disableLighting() const { enableLighting(false); }
 
     unsigned int getSelectionIdAt(unsigned int x, unsigned int y) const;
 
@@ -69,6 +77,7 @@ private:
     GLuint programHandle;
     GLuint positionHandle;
     GLuint colorHandle;
+    GLuint normalHandle;
 
     int width, height;
 

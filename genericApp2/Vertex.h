@@ -19,10 +19,12 @@ public:
     Vertex(float x, float y, float z);
 
     float color[4];
+    float normal[3];
 
     Vertex& operator=(const Vertex &v);
     void setPosition(float x, float y, float z);
     void setColor(float r, float g, float b, float a = 1);
+    void setNormal(float x, float y, float z);
 };
 
 class VertexList
@@ -33,6 +35,7 @@ public:
 
     float *getPositionPointer() const;
     float *getColorPointer() const;
+    float *getNormalPointer() const;
 
     void setSize(unsigned int size);
 

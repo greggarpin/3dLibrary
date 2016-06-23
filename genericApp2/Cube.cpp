@@ -9,29 +9,60 @@
 #include "Cube.h"
 #include "RenderContext.h"
 
-Cube::Cube() : vertices(8)
+Cube::Cube() : vertices(24)
 {
-    float sz = 0.5;
-    vertices[0].setPosition(-sz, -sz, -sz);
-    vertices[1].setPosition( sz, -sz, -sz);
-    vertices[2].setPosition(-sz,  sz, -sz);
-    vertices[3].setPosition( sz,  sz, -sz);
-    vertices[4].setPosition(-sz, -sz,  sz);
-    vertices[5].setPosition( sz, -sz,  sz);
-    vertices[6].setPosition(-sz,  sz,  sz);
-    vertices[7].setPosition( sz,  sz,  sz);
-/*
-    vertices[0].setColor(1, 0, 0);
-    vertices[1].setColor(1, .5, 0);
-    vertices[2].setColor(1, 1, 0);
-    vertices[3].setColor(0, 1, 0);
-    vertices[4].setColor(0, 0, 1);
-    vertices[5].setColor(1, 0, 1);
-    vertices[6].setColor(1, 0.5, .5);
-    vertices[7].setColor(1, .33, .67);
- /*/
+    size = 0.5;
+    int v = 0;
+
+    // Back face
+    vertices[v].setPosition(-size,  size, -size); vertices[v++].setNormal(0, 0, -1);
+    vertices[v].setPosition(-size, -size, -size); vertices[v++].setNormal(0, 0, -1);
+    vertices[v].setPosition( size, -size, -size); vertices[v++].setNormal(0, 0, -1);
+    vertices[v].setPosition( size,  size, -size); vertices[v++].setNormal(0, 0, -1);
+
+    // Front face
+    vertices[v].setPosition( size,  size,  size); vertices[v++].setNormal(0, 0, 1);
+    vertices[v].setPosition( size, -size,  size); vertices[v++].setNormal(0, 0, 1);
+    vertices[v].setPosition(-size, -size,  size); vertices[v++].setNormal(0, 0, 1);
+    vertices[v].setPosition(-size,  size,  size); vertices[v++].setNormal(0, 0, 1);
+
+    // Left face
+    vertices[v].setPosition(-size,  size,  size); vertices[v++].setNormal(-1, 0, 0);
+    vertices[v].setPosition(-size, -size,  size); vertices[v++].setNormal(-1, 0, 0);
+    vertices[v].setPosition(-size, -size, -size); vertices[v++].setNormal(-1, 0, 0);
+    vertices[v].setPosition(-size,  size, -size); vertices[v++].setNormal(-1, 0, 0);
+
+    // Right face
+    vertices[v].setPosition( size,  size, -size); vertices[v++].setNormal(1, 0, 0);
+    vertices[v].setPosition( size, -size, -size); vertices[v++].setNormal(1, 0, 0);
+    vertices[v].setPosition( size, -size,  size); vertices[v++].setNormal(1, 0, 0);
+    vertices[v].setPosition( size,  size,  size); vertices[v++].setNormal(1, 0, 0);
+
+    // Bottom face
+    vertices[v].setPosition(-size, -size, -size); vertices[v++].setNormal(0, 1, 0);
+    vertices[v].setPosition(-size, -size,  size); vertices[v++].setNormal(0, 1, 0);
+    vertices[v].setPosition( size, -size,  size); vertices[v++].setNormal(0, 1, 0);
+    vertices[v].setPosition( size, -size, -size); vertices[v++].setNormal(0, 1, 0);
+
+    // Top face
+    vertices[v].setPosition( size,  size, -size); vertices[v++].setNormal(0, -1, 0);
+    vertices[v].setPosition( size,  size,  size); vertices[v++].setNormal(0, -1, 0);
+    vertices[v].setPosition(-size,  size,  size); vertices[v++].setNormal(0, -1, 0);
+    vertices[v].setPosition(-size,  size, -size); vertices[v++].setNormal(0, -1, 0);
+
     setColor(0, 0, 1);
-//*/
+    vertices[0].setColor(1, 0, 0);
+    vertices[1].setColor(1, 0, 0);
+    vertices[2].setColor(1, 0, 0);
+    vertices[3].setColor(1, 0, 0);
+    vertices[10].setColor(1, 0, 0);
+    vertices[11].setColor(1, 0, 0);
+    vertices[12].setColor(1, 0, 0);
+    vertices[13].setColor(1, 0, 0);
+    vertices[16].setColor(1, 0, 0);
+    vertices[19].setColor(1, 0, 0);
+    vertices[20].setColor(1, 0, 0);
+    vertices[23].setColor(1, 0, 0);
 }
 
 Cube::~Cube()
@@ -42,42 +73,100 @@ void Cube::render(RenderMode mode) const
 {
     glVertexAttribPointer(RenderContext::getContext()->getPositionHandle(), 3, GL_FLOAT, GL_FALSE, vertices.getStride(), vertices.getPositionPointer());
 
+    glVertexAttribPointer(RenderContext::getContext()->getNormalHandle(), 3, GL_FLOAT, GL_FALSE, vertices.getStride(), vertices.getNormalPointer());
     if (mode == wireframe || mode == solidWireframe)
     {
-        static GLfloat blackColor [] = {0,0,0,1};
+        static const GLfloat blackColor [] = {0,0,0,1};
         glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, 0, blackColor);
 
-        static GLushort wireframeIndices [] = {0, 1, 3, 2, 0, 4, 5, 7, 6, 4, 0, 2, 6, 7, 3, 1, 5};
+        RenderContext::getContext()->disableLighting();
 
-        glDrawElements(GL_LINE_STRIP, 17, GL_UNSIGNED_SHORT, wireframeIndices);
+        static GLushort wireframeIndices [] = {0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 7, 1, 6, 3, 4, 2, 5};
+
+        glDrawElements(GL_LINE_STRIP, sizeof(wireframeIndices)/sizeof(GLushort), GL_UNSIGNED_SHORT, wireframeIndices);
     }
 
     if (mode != wireframe)
     {
         static GLushort solidIndices [] = {
-                                            7, 5, 4,
-                                            6, 7, 4,
-                                            2, 0, 1,
-                                            2, 1, 3,
-                                            3, 1, 5,
-                                            3, 5, 7,
-                                            6, 4, 0,
-                                            6, 0, 2,
-                                            7, 6, 2,
-                                            7, 2, 3,
-                                            4, 5, 1,
-                                            4, 1, 0
+                                            // Back face
+                                            0, 1, 2,
+                                            0, 2, 3,
+
+                                            // Front face
+                                            4, 5, 6,
+                                            4, 6, 7,
+
+                                            // Left face
+                                            8, 9, 10,
+                                            8, 10, 11,
+
+                                            // Right face
+                                            12, 13, 14,
+                                            12, 14, 15,
+
+                                            // Bottom face
+                                            16, 17, 18,
+                                            16, 18, 19,
+
+                                            // Top face
+                                            20, 21, 22,
+                                            20, 22, 23
                                             };
+
+        RenderContext::getContext()->enableLighting();
+
         glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, vertices.getStride(), vertices.getColorPointer());
+        glVertexAttribPointer(RenderContext::getContext()->getNormalHandle(), 3, GL_FLOAT, GL_FALSE, vertices.getStride(), vertices.getNormalPointer());
         glDrawElements(GL_TRIANGLES, sizeof(solidIndices)/sizeof(GLushort), GL_UNSIGNED_SHORT, solidIndices);
     }
+    renderNormals();
 }
 
 void Cube::setColor(float r, float g, float b)
 {
     color.set(r, g, b);
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < vertices.getNumVertices(); i++)
     {
         vertices[i].setColor(r, g, b);
     }
+}
+
+void Cube::renderNormals() const
+{
+    VertexList normalVertices(12);
+    const float normalLength = 1;
+
+    unsigned int v = 0;
+
+    normalVertices[v++].setPosition(0, 0, size);
+    normalVertices[v++].setPosition(0, 0, size + normalLength);
+
+    normalVertices[v++].setPosition(0, 0, -size);
+    normalVertices[v++].setPosition(0, 0, -size - normalLength);
+
+    normalVertices[v++].setPosition(0, size, 0);
+    normalVertices[v++].setPosition(0, size + normalLength, 0);
+
+    normalVertices[v++].setPosition(0, -size, 0);
+    normalVertices[v++].setPosition(0, -size - normalLength, 0);
+
+    normalVertices[v++].setPosition(size, 0, 0);
+    normalVertices[v++].setPosition(size + normalLength, 0, 0);
+
+    normalVertices[v++].setPosition(-size, 0, 0);
+    normalVertices[v++].setPosition(-size - normalLength, 0, 0);
+
+    glVertexAttribPointer(RenderContext::getContext()->getPositionHandle(), 3, GL_FLOAT, GL_FALSE, normalVertices.getStride(), normalVertices.getPositionPointer());
+
+    glVertexAttribPointer(RenderContext::getContext()->getNormalHandle(), 3, GL_FLOAT, GL_FALSE, normalVertices.getStride(), normalVertices.getNormalPointer());
+
+    static const GLfloat blackColor [] = {0,0,0,1};
+    glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, 0, blackColor);
+
+    RenderContext::getContext()->disableLighting();
+
+    static GLushort indices [] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+
+    glDrawElements(GL_LINES, sizeof(indices)/sizeof(GLushort), GL_UNSIGNED_SHORT, indices);
 }

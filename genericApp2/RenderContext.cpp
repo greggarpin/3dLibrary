@@ -6,6 +6,8 @@
 //  Copyright (c) 2015 Arpin, Gregg. All rights reserved.
 //
 
+#include <math.h>
+
 #include "RenderContext.h"
 
 RenderContext RenderContext::rc;
@@ -63,6 +65,25 @@ void RenderContext::setColorHandle(GLuint handle)
     colorHandle = handle;
 }
 
+void RenderContext::setNormalHandle(GLuint handle)
+{
+    if (handle != VERTEX_HANDLE_NONE)
+    {
+        glEnableVertexAttribArray(handle);
+    }
+    else if (normalHandle != VERTEX_HANDLE_NONE)
+    {
+        glDisable(normalHandle);
+    }
+
+    normalHandle = handle;
+}
+
+GLuint RenderContext::getNormalHandle() const
+{
+    return normalHandle;
+}
+
 #define intPartToFloat(intVal, bitShift) (((intVal >> bitShift) & 0x000000FF)/255.0)
 
 void RenderContext::applySelectionId(unsigned int selectionId)
@@ -94,6 +115,14 @@ void RenderContext::applyModelviewMatrix()
     GLint modelviewUniform = glGetUniformLocation(programHandle, "Modelview");
 
     glUniformMatrix4fv(modelviewUniform, 1, 0, modelviewMatrix.getPointer());
+
+    GLint normalModelviewUniform = glGetUniformLocation(programHandle, "NormalModelview");
+
+    // As long as we don't allow any non-uniform scaling, the normal transformation matrix
+    // is the same as the regular transformation matrix.  (E.g., in practice, we only need
+    // upper left 3x3 from the modelview matrix - current implementation doesn't support it
+    // and it can be easily done from vertex program for now)
+    glUniformMatrix4fv(normalModelviewUniform, 1, 0, modelviewMatrix.getPointer());
 }
 
 void RenderContext::setWidth(int wp)
@@ -114,6 +143,35 @@ void RenderContext::setHeight(int hp)
 int RenderContext::getHeight() const
 {
     return height;
+}
+
+void RenderContext::applyLightColor(float r, float g, float b) const
+{
+    GLint lightColUniform = glGetUniformLocation(programHandle, "LightColor");
+    glUniform3f(lightColUniform, r, g, b);
+}
+
+void RenderContext::applyLightPosition(float x, float y, float z, bool normalize) const
+{
+    GLint lightDirUniform = glGetUniformLocation(programHandle, "LightPosition");
+    if (normalize)
+    {
+        float len = sqrt(x*x + y*y + z*z);
+        if (len > 0)
+        {
+            x /= len;
+            y /= len;
+            z /= len;
+        }
+    }
+
+    glUniform3f(lightDirUniform, x, y, z);
+}
+
+void RenderContext::enableLighting(bool enable) const
+{
+    GLint lightingToggle = glGetUniformLocation(programHandle, "EnableLighting");
+    glUniform1f(lightingToggle, (enable ? 1.0 : 0.0));
 }
 
 void RenderContext::applyProjectionMatrix()

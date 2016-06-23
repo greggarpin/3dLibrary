@@ -18,6 +18,7 @@ public:
     virtual ~Cube();
 
     void render(RenderMode mode) const;
+    void renderNormals() const;
 
     inline void setColor(const Vector &pColor) { setColor(pColor.getR(), pColor.getG(), pColor.getB()); };
     void setColor(float r, float g, float b);
@@ -26,6 +27,8 @@ public:
 private:
     VertexList vertices;
     Vector color;
+
+    float size;
 };
 
 #endif /* defined(__genericApp2__Cube__) */
