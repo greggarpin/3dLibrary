@@ -17,7 +17,6 @@ void main(void)
         /*
 gl_FragColor = vec4((DestinationNormal + vec3(1.0,1.0,1.0))/2.0, 1.0);
 /*/
-// TODO:: Normals are still not coming through right
         lowp float diffuseStrength = 0.33;
         lowp float lightContrib = max(0.0, dot(LightPosition, DestinationNormal));
         lowp vec3 ambient = vec3((1.0 - diffuseStrength) * DestinationColor);

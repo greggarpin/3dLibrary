@@ -19,6 +19,7 @@
 #include "Stack.h"
 #include "Vector.h"
 #include "Util.h"
+#include "TouchEvent.h"
 
 #define STRINGIFY(A) #A
 #include "shaders/Simple.vert"
@@ -112,6 +113,9 @@ public:
     void SetPitch(float rad);
     void SetYaw(float rad);
 
+    void onTouchStart(const TouchEvent &event);
+    void onTouchMoved(const TouchEvent &event);
+    void onTouchEnd(const TouchEvent &event);
     void onTouchStart(int x, int y);
     void onTouchMoved(int x, int y);
     void onTouchEnd(int x, int y);
@@ -129,6 +133,7 @@ private:
     void RenderObject(const IRenderable &obj) const;
     void selectPositionalObject(PositionalObject *obj);
     void deselectPositionalObject();
+    bool linesAreColinear(const Vector &l1p0, const Vector &l1p1, const Vector &l2p0, const Vector &l2p1);
     GLuint m_framebuffer;
     GLuint m_renderbuffer;
     GLuint m_depthbuffer;
@@ -136,7 +141,6 @@ private:
     float xRot, yRot, zRot;
     float roll, pitch, yaw;
     bool useRollPitchYaw;
-    int touchX, touchY;
     int numTouchMoves;
     bool touchStarted;
     float cameraPosition[3];
@@ -147,6 +151,8 @@ mutable    Cube testCube;
     IRenderable **renderableObjs;
     unsigned int numRenderableObjs;
     PositionalObject *selectedPositionalObject;
+
+    TouchEventList touchList;
 };
 
 void dotests()
@@ -162,6 +168,9 @@ void dotests()
 
     StackTestSled sts;
     sts.test();
+
+    TouchEventTestSled tets;
+    tets.test();
 }
 IRenderingEngine* CreateRenderer2()
 {
@@ -276,7 +285,7 @@ void RenderingEngine2::Render() const
 
     RenderContext::getMutableContext()->enableLighting();
     RenderContext::getMutableContext()->applyLightColor(1, 1, 1);
-    RenderContext::getMutableContext()->applyLightPosition(1, 1, 1, true);
+    RenderContext::getMutableContext()->applyLightPosition(1, 1, 0, true);
 
     InitializeCameraMatrix();
 
@@ -388,96 +397,202 @@ void RenderingEngine2::ApplyRotation() const
     RenderContext::getMutableContext()->applyModelviewMatrix();
 }
 
-#define NORMALIZED_TOUCH_CHANGE_X(deltaX) (PI * ((float)deltaX) / (float)RenderContext::getContext()->getWidth())
-#define NORMALIZED_TOUCH_CHANGE_Y(deltaY) (PI * ((float)deltaY) / (float)RenderContext::getContext()->getHeight())
-#define TAP_MOVE_THRESHOLD 2
-
-void RenderingEngine2::onTouchStart(int x, int y)
+void RenderingEngine2::onTouchStart(const TouchEvent &event)
 {
-    touchStarted = true;
-    numTouchMoves = 0;
+    touchList.clear();
 
-    touchX = x;
-    touchY = y;
-}
+    touchList.appendEvent(event);
 
-void RenderingEngine2::onTouchMoved(int x, int y)
-{
-    if (!touchStarted)
-        return;
+    deselectPositionalObject();
 
-    numTouchMoves++;
-
-    if (numTouchMoves < TAP_MOVE_THRESHOLD)
-        return;
-
-    if (selectedPositionalObject == NULL)
+    // Single touch, attempt to select something
+    if (event.getNumPoints() == 1)
     {
+        const TouchPoint &curPoint = event.getPoint(0);
+
         RenderMode prevMode = renderMode;
         renderMode = selection;
         Render();
         renderMode = prevMode;
 
-        unsigned int selectedId = RenderContext::getContext()->getSelectionIdAt(x, RenderContext::getContext()->getHeight()-y);
+        unsigned int selectedId =
+            RenderContext::getContext()->getSelectionIdAt(
+                curPoint.getX(),
+                RenderContext::getContext()->getHeight() - curPoint.getY());
 
         if (selectedId != 0)
         {
-            LOG("SelectedId = ");
-            LOG(selectedId);
-
             IRenderable *selectedObject = IRenderable::findObjectById(selectedId);
             selectPositionalObject(dynamic_cast<PositionalObject*>(selectedObject));
         }
     }
 
-    if (selectedPositionalObject != NULL)
+}
+
+bool RenderingEngine2::linesAreColinear(const Vector &l1p0, const Vector &l1p1, const Vector &l2p0, const Vector &l2p1)
+{
+    // Uses definition of a line as  {p : p = p0 + lambda(p1 - p0)}
+
+    const float nearlyZero = 0.1;
+
+    Vector l1Dir(l1p1);
+    l1Dir.subtract(l1p0);
+    float l1DirLen = l1Dir.length();
+
+    Vector l2Dir(l2p1);
+    l2Dir.subtract(l2p0);
+    float l2DirLen = l2Dir.length();
+
+    // If the lines aren't parallel, they aren't colinear
+    if (fabs(l1Dir.dot(l2Dir)) - (l1DirLen * l2DirLen) > nearlyZero)
+        return false;
+
+    // Knowing that the lines are parallel, we need only check that one point from the second line is part of the first line
+    // We do this by substituting l1p0 for p, l1p0 for p0 and l1p1 for p1 in the equation above and solving for lambda:
+    //     lambda  =    (p - p0)   =   (l2p0 - l1p0)
+    //                  -------        -------------
+    //                  (p1 - p0)      (l1p1 - l1p0)
+    //
+    // Using x values to calculate the above, we substitute back in to the original equation and check for a true
+    // statement when using y values:
+    // l2p0.y = l1p0.y + (l2p0.x - l1p0.x) * (l1p1.y - l1p0.y)
+    //                   -----------------
+    //                   (l1p1.x - l1p0.x)
+    //
+    // Rearranging we get:
+    // (l2p0.y - l1p0.y)(l1p1.x - l1p0.x) = (l2p0.x - l1p0.x) * (l1p1.y - l1p0.y)
+    //
+    // Or
+    // (l2p0.y - l1p0.y)(l1p1.x - l1p0.x) - (l2p0.x - l1p0.x) * (l1p1.y - l1p0.y) = 0
+    //
+    // Of course, we have already calculated l1p1 - l1p0 above, so:
+    // (l2p0.y - l1p0.y) * l1Dir.x - (l2p0.x - l1p0.x) * l1Dir.y = 0
+    float leftHandSide = (l2p0.getY() - l1p0.getY()) * l1Dir.getX() - (l2p0.getX() - l1p0.getX()) * l1Dir.getY();
+
+    return (fabs(leftHandSide) < nearlyZero);
+}
+
+void RenderingEngine2::onTouchMoved(const TouchEvent &event)
+{
+    // If we haven't done a touchStart first
+    if (touchList.getNumItems() < 1)
+        return;
+
+    // If the number of touch points has changed, start over
+    if (event.getNumPoints() != touchList.getFirst()->getNumPoints())
     {
-        // TODO:: Need to project movement onto appropriate plane
-        selectedPositionalObject->MoveBy(((float)(x - touchX))/100.0, ((float)(y - touchY))/100.0, 0);
-    }
-    else if (false)
-    {
-        float dx = NORMALIZED_TOUCH_CHANGE_Y(y - touchY);
-        float dy = NORMALIZED_TOUCH_CHANGE_X(touchX - x);
-        testCube.RotateBy(dx, dy, 0);
-        for (unsigned int i = 0; i < 8; i++)
-        {
-            tc[i].RotateBy(dx, dy, 0);
-            dx = -dx;
-            dy = -dy;
-        }
-    }
-    else if (useRollPitchYaw)
-    {
-        pitch += NORMALIZED_TOUCH_CHANGE_Y(y - touchY);
-        yaw += NORMALIZED_TOUCH_CHANGE_X(touchX - x);
-    }
-    else
-    {
-        Rotate(NORMALIZED_TOUCH_CHANGE_Y(y - touchY), NORMALIZED_TOUCH_CHANGE_X(touchX - x), 0);
+        touchList.clear();
+        onTouchStart(event);
+        return;
     }
 
-    touchX = x;
-    touchY = y;
+    touchList.appendEvent(event);
+
+    // If we haven't moved enough to be counted
+    const unsigned int tap_move_threshold = 2;
+    if (touchList.getNumItems() < tap_move_threshold)
+        return;
+
+    // Moving a selected object
+    if (event.getNumPoints() == 1)
+    {
+        if (selectedPositionalObject != NULL)
+        {
+            const TouchPoint &prevPoint = touchList.getPrevious()->getPoint(0);
+            const TouchPoint &curPoint = event.getPoint(0);
+// TODO:: Need to project movement onto appropriate plane
+            selectedPositionalObject->MoveBy(
+                ((float)(curPoint.getX() - prevPoint.getX()))/100.0,
+                ((float)(prevPoint.getY() - curPoint.getY()))/100.0,
+                0);
+        }
+    }
+    else if (event.getNumPoints() == 2)
+    {
+        const TouchPoint &prevPoint0 = touchList.getPrevious()->getPoint(0);
+        const TouchPoint &prevPoint1 = touchList.getPrevious()->getPoint(1);
+        const TouchPoint &curPoint0 = event.getPoint(0);
+        const TouchPoint &curPoint1 = event.getPoint(1);
+
+        Vector delta0(curPoint0.getX() - prevPoint0.getX(), prevPoint0.getY() - curPoint0.getY(), 0);
+        Vector delta1(curPoint1.getX() - prevPoint1.getX(), prevPoint1.getY() - curPoint1.getY(), 0);
+
+        float dotProduct = delta0.dot(delta1);
+        float d0Len = delta0.length();
+        float d1Len = delta1.length();
+        float lenDotProduct = d0Len*d1Len;
+        float normalizedDot = dotProduct/lenDotProduct;
+
+        // If both touches move in parallel, move along x and y axes
+        if (fabs(normalizedDot - 1) < 0.1)
+        {
+            cameraPosition[0] -= delta0.getX()/100.0;
+            cameraPosition[1] -= delta0.getY()/100.0;
+        }
+        else
+        {
+            const TouchPoint &firstPoint0 = touchList.getFirst()->getPoint(0);
+            const TouchPoint &firstPoint1 = touchList.getFirst()->getPoint(1);
+            Vector midpoint(firstPoint0.getX(), firstPoint0.getY(), 0);
+            midpoint.add(firstPoint1.getX(), firstPoint1.getY(), 0);
+            midpoint.multiply(0.5);
+
+            Vector prevPoint0Vec(prevPoint0.getX(), prevPoint0.getY(), 0);
+            Vector prevPoint1Vec(prevPoint1.getX(), prevPoint1.getY(), 0);
+            Vector curPoint0Vec(curPoint0.getX(), curPoint0.getY(), 0);
+            Vector curPoint1Vec(curPoint1.getX(), curPoint1.getY(), 0);
+
+            Vector point0Dir(curPoint0Vec.getX() - prevPoint0Vec.getX(),
+                             prevPoint0Vec.getY() - curPoint0Vec.getY(),
+                             0);
+            float point0DirLen = point0Dir.length();
+
+            Vector point0Radius(curPoint0Vec.getX() - midpoint.getX(),
+                                midpoint.getY() - curPoint0Vec.getY(),
+                                0);
+            float point0RadiusLen = point0Radius.length();
+
+            // If we're moving towards or away from the midpoint, we have a pinch, move along z axis
+            if (fabs(point0Dir.dot(point0Radius)) > 0.9 * point0DirLen * point0RadiusLen)
+            {
+                float curDist = curPoint0Vec.distance(curPoint1Vec);
+                float prevDist = prevPoint0Vec.distance(prevPoint1Vec);
+                float factor = 50.0;
+
+                if (curDist > prevDist)
+                    cameraPosition[2] -= d0Len/factor;
+                else
+                    cameraPosition[2] += d0Len/factor;
+
+            }
+            // Otherwise touches are moving in a circular pattern, rotate around y axis
+            else
+            {
+                yaw += delta0.getX()/10.0;
+            }
+        }
+    }
+}
+
+void RenderingEngine2::onTouchEnd(const TouchEvent &event)
+{
+    touchList.appendEvent(event);
+
+    deselectPositionalObject();
+
+    touchList.clear();
+}
+
+void RenderingEngine2::onTouchStart(int x, int y)
+{
+}
+
+void RenderingEngine2::onTouchMoved(int x, int y)
+{
 }
 
 void RenderingEngine2::onTouchEnd(int x, int y)
 {
-    if (!touchStarted)
-        return;
-
-    deselectPositionalObject();
-
-    if (numTouchMoves <= TAP_MOVE_THRESHOLD)
-    {
-        onTap(x, y);
-        return;
-    }
-
-    touchX = x;
-    touchY = y;
-
-    touchStarted = false;
 }
 
 void RenderingEngine2::selectPositionalObject(PositionalObject *obj)

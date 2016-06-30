@@ -23,8 +23,15 @@ public:
     inline float * getPointer() { return els; };
 
     void add(float x, float y, float z);
+    inline void add(const Vector &v) { add(v.getX(), v.getY(), v.getZ()); };
+    inline void subtract(const Vector &v) { add(-v.getX(), -v.getY(), -v.getZ()); };
+
+    void multiply(float scalar);
 
     float dot(const Vector &v) const;
+
+    float length() const;
+    float distance(const Vector &other) const;
 
     inline float getR() const { return els[0]; };
     inline float getG() const { return els[1]; };

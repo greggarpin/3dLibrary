@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 #include "Vector.h"
 
 Vector::Vector()
@@ -39,6 +40,13 @@ void Vector::add(float x, float y, float z)
     els[2] += z;
 }
 
+void Vector::multiply(float scalar)
+{
+    els[0] *= scalar;
+    els[1] *= scalar;
+    els[2] *= scalar;
+}
+
 void Vector::multiplyByMatrix(const Matrix &m)
 {
     set(getX() * m.get(0, 0) + getY() * m.get(0, 1) + getZ() * m.get(0, 2) + m.get(0, 3),
@@ -51,11 +59,25 @@ float Vector::dot(const Vector &v) const
     return getX() * v.getX() + getY() * v.getY() + getZ() * v.getZ();
 }
 
+float Vector::length() const
+{
+    return sqrt(getX()*getX() + getY()*getY() + getZ()*getZ());
+}
+
+float Vector::distance(const Vector &other) const
+{
+    float dx = other.getX() - getX();
+    float dy = other.getY() - getY();
+    float dz = other.getZ() - getZ();
+
+    return sqrt(dx*dx + dy*dy + dz*dz);
+}
+
 void VectorTestSled::test()
 {
     Vector u;
-    Vector v(1, 2, 3);
-    Vector w(1, 2, 3);
+    const Vector v(1, 2, 3);
+    const Vector w(1, 2, 3);
 
     test_fail_if(u == v, "u and v should not be equal");
     test_fail_if(!(v == w), "v and w should be equal");
@@ -69,6 +91,9 @@ void VectorTestSled::test()
 
     test_fail_if(expDp != vwDp, "vwDp unexpected dot product");
     test_fail_if(vvDp != vwDp, "vvDP unexpected dot product");
+
+    test_fail_if(fabs(v.length() - sqrt(14)) > 0.000001, "Incorrect length of vector v");
+    test_fail_if(fabs(v.distance(w)) > 0.000001, "Incorrect distance between v and w - expected 0");
 
     test_pass;
 }

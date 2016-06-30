@@ -19,6 +19,9 @@ public:
     void OnRotate(DeviceOrientation orientation) {}
     void Rotate(float xRadDelta, float yRadDelta, float zRadDelta) {};
 
+    void onTouchStart(const TouchEvent &event) {};
+    void onTouchMoved(const TouchEvent &event) {};
+    void onTouchEnd(const TouchEvent &event) {};
     void onTouchStart(int x, int y) {};
     void onTouchMoved(int x, int y) {};
     void onTouchEnd(int x, int y) {};

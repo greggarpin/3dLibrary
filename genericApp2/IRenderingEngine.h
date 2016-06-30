@@ -9,6 +9,8 @@
 #ifndef genericApp2_IRenderingEngine_h
 #define genericApp2_IRenderingEngine_h
 
+#include "TouchEvent.h"
+
 enum DeviceOrientation {
     DeviceOrientationUnknown,
     DeviceOrientationPortrait,
@@ -39,6 +41,10 @@ struct IRenderingEngine {
     virtual void onTouchStart(int x, int y) = 0;
     virtual void onTouchMoved(int x, int y) = 0;
     virtual void onTouchEnd(int x, int y) = 0;
+
+    virtual void onTouchStart(const TouchEvent &event) = 0;
+    virtual void onTouchMoved(const TouchEvent &event) = 0;
+    virtual void onTouchEnd(const TouchEvent &event) = 0;
 
     virtual ~IRenderingEngine() {}
 };

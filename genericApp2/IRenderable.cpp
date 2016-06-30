@@ -112,4 +112,6 @@ void IRenderableTestSled::test()
     foundObj = IRenderable::findObjectById(testId);
 
     test_fail_if(foundObj != NULL, "Did not expect to find 'test' registered after destruction");
+
+    test_pass;
 }

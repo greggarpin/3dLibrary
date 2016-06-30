@@ -131,46 +131,44 @@
 
 - (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    UITouch* touch = [touches anyObject];
-    CGPoint location = [touch locationInView:self];
-#if TARGET_IPHONE_SIMULATOR
-    if (touches.count == 2)
+    TouchPoint *tp = new TouchPoint[touches.count];
+    for (int i = 0; i < touches.count; i++)
     {
-        m_renderingEngine->SetYaw(0);
-        m_renderingEngine->SetPitch(0);
-        m_renderingEngine->SetRoll(0);
-        return;
+        UITouch* touch = [[touches allObjects] objectAtIndex:i];
+        CGPoint loc = [touch locationInView:self];
+        tp[i].set(loc.x, loc.y);
     }
-#endif
-    m_renderingEngine->onTouchStart(location.x, location.y);
+
+    TouchEvent te(tp, touches.count);
+    m_renderingEngine->onTouchStart(te);
 }
 
 - (void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
-#if TARGET_IPHONE_SIMULATOR
-    if (touches.count == 2)
+    TouchPoint *tp = new TouchPoint[touches.count];
+    for (int i = 0; i < touches.count; i++)
     {
-        return;
+        UITouch* touch = [[touches allObjects] objectAtIndex:i];
+        CGPoint loc = [touch locationInView:self];
+        tp[i].set(loc.x, loc.y);
     }
-#endif
-    UITouch* touch = [touches anyObject];
-    CGPoint location = [touch locationInView:self];
 
-    m_renderingEngine->onTouchMoved(location.x, location.y);
+    TouchEvent te(tp, touches.count);
+    m_renderingEngine->onTouchMoved(te);
 }
 
 - (void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-#if TARGET_IPHONE_SIMULATOR
-    if (touches.count == 2)
+    TouchPoint *tp = new TouchPoint[touches.count];
+    for (int i = 0; i < touches.count; i++)
     {
-        return;
+        UITouch* touch = [[touches allObjects] objectAtIndex:i];
+        CGPoint loc = [touch locationInView:self];
+        tp[i].set(loc.x, loc.y);
     }
-#endif
-    UITouch* touch = [touches anyObject];
-    CGPoint location = [touch locationInView:self];
 
-    m_renderingEngine->onTouchEnd(location.x, location.y);
+    TouchEvent te(tp, touches.count);
+    m_renderingEngine->onTouchEnd(te);
 }
 
 - (void) locationManager:(CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading

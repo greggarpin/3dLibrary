@@ -1,6 +1,7 @@
 #ifndef __genericApp2__Stack__
 #define __genericApp2__Stack__
 
+// TODO:: Should probably leverage List class
 #include "Util.h"
 
 template <class T> class Stack
@@ -80,11 +81,13 @@ public:
             testStack.push(elements[i]);
             test_fail_if(testStack.getNumItems() != i + 1, "Wrong number of items in stack");
         }
-        for (unsigned int i  = 0; i < numElements; --i)
+        test_fail_if(testStack.getNumItems() != numElements, "Incorrect number of elements in populated stack");
+        for (int i = numElements - 1; i >= 0; --i)
         {
             test_fail_if(testStack.pop() != elements[i], "Incorrect item found in stack");
             test_fail_if(testStack.getNumItems() != i, "Incorrect number of items in stack during pop test");
         }
+        test_pass;
     }
 };
 
