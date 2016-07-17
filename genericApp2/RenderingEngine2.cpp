@@ -20,6 +20,7 @@
 #include "Vector.h"
 #include "Util.h"
 #include "TouchEvent.h"
+#include "Camera.h"
 
 #define STRINGIFY(A) #A
 #include "shaders/Simple.vert"
@@ -139,11 +140,9 @@ private:
     GLuint m_depthbuffer;
     ShaderProgram normalProgram;
     float xRot, yRot, zRot;
-    float roll, pitch, yaw;
     bool useRollPitchYaw;
     int numTouchMoves;
     bool touchStarted;
-    float cameraPosition[3];
 
     Polygon testPolygon;
 mutable    Cube testCube;
@@ -171,6 +170,9 @@ void dotests()
 
     TouchEventTestSled tets;
     tets.test();
+
+    CameraTestSled cts;
+    cts.test();
 }
 IRenderingEngine* CreateRenderer2()
 {
@@ -190,14 +192,9 @@ RenderingEngine2::RenderingEngine2() : numRenderableObjs(0), selectedPositionalO
     glBindRenderbuffer(GL_RENDERBUFFER, m_renderbuffer);
 
     xRot = yRot = zRot = 0;
-    roll = pitch = yaw = 0;
     touchStarted = false;
     numTouchMoves = 0;
     useRollPitchYaw = true;
-
-    cameraPosition[0] = 0;
-    cameraPosition[1] = 5;
-    cameraPosition[0] = 0;
 
     renderableObjs = new IRenderable*[numRenderableObjs++];
     renderableObjs[0] = &testCube;
@@ -305,7 +302,9 @@ void RenderingEngine2::Render() const
 
 void RenderingEngine2::InitializeCameraMatrix() const
 {
-    RenderContext::getMutableContext()->modelviewMatrix.makeTranslationMatrix(-cameraPosition[0], -cameraPosition[1], -cameraPosition[2]);
+    const Camera *cam = Camera::getCamera();
+
+    RenderContext::getMutableContext()->modelviewMatrix.makeTranslationMatrix(-cam->getPositionX(), -cam->getPositionY(), -cam->getPositionZ());
     RenderContext::getMutableContext()->applyModelviewMatrix();
     ApplyRotation();
 }
@@ -364,6 +363,7 @@ void RenderingEngine2::SetRotation(float xRad, float yRad, float zRad)
 void RenderingEngine2::ApplyRotation() const
 {
     Matrix m;
+    Camera *cam = Camera::getCamera();
 
     static float xAxis []  = {1, 0, 0};
     static float yAxis []  = {0, 1, 0};
@@ -384,13 +384,13 @@ void RenderingEngine2::ApplyRotation() const
     }
     else
     {
-        m.makeRotationMatrix(yAxis, yaw);
+        m.makeRotationMatrix(yAxis, cam->getYaw());
         RenderContext::getMutableContext()->modelviewMatrix.multiply(m);
 
-        m.makeRotationMatrix(xAxis, pitch);
+        m.makeRotationMatrix(xAxis, cam->getPitch());
         RenderContext::getMutableContext()->modelviewMatrix.multiply(m);
 
-        m.makeRotationMatrix(zAxis, roll);
+        m.makeRotationMatrix(zAxis, cam->getRoll());
         RenderContext::getMutableContext()->modelviewMatrix.multiply(m);
     }
 
@@ -493,6 +493,8 @@ void RenderingEngine2::onTouchMoved(const TouchEvent &event)
     if (touchList.getNumItems() < tap_move_threshold)
         return;
 
+    Camera *cam = Camera::getCamera();
+
     // Moving a selected object
     if (event.getNumPoints() == 1)
     {
@@ -526,8 +528,8 @@ void RenderingEngine2::onTouchMoved(const TouchEvent &event)
         // If both touches move in parallel, move along x and y axes
         if (fabs(normalizedDot - 1) < 0.1)
         {
-            cameraPosition[0] -= delta0.getX()/100.0;
-            cameraPosition[1] -= delta0.getY()/100.0;
+            cam->increasePositionX(-delta0.getX()/100.0);
+            cam->increasePositionY(-delta0.getY()/100.0);
         }
         else
         {
@@ -560,15 +562,15 @@ void RenderingEngine2::onTouchMoved(const TouchEvent &event)
                 float factor = 50.0;
 
                 if (curDist > prevDist)
-                    cameraPosition[2] -= d0Len/factor;
+                    cam->increasePositionZ(-d0Len/factor);
                 else
-                    cameraPosition[2] += d0Len/factor;
+                    cam->increasePositionZ(d0Len/factor);
 
             }
             // Otherwise touches are moving in a circular pattern, rotate around y axis
             else
             {
-                yaw += delta0.getX()/10.0;
+                cam->increaseYaw(delta0.getX()/10.0);
             }
         }
     }
@@ -579,6 +581,9 @@ void RenderingEngine2::onTouchEnd(const TouchEvent &event)
     touchList.appendEvent(event);
 
     deselectPositionalObject();
+
+    if (touchList.getNumItems() == 2)
+        onTap(event.getPoint(0).getX(), event.getPoint(0).getY());
 
     touchList.clear();
 }
@@ -614,42 +619,29 @@ void RenderingEngine2::deselectPositionalObject()
 
 void RenderingEngine2::onTap(int x, int y)
 {
-    testRotation = !testRotation;
-    return;
-    if (x < 100)
-        testCube.MoveBy(-0.1, 0, 0);
-    else if (x > 220)
-        testCube.MoveBy(0.1, 0, 0);
-    else if (y < 150)
-        testCube.MoveBy(0, 0.1, 0);
-    else if (y > 330)
-        testCube.MoveBy(0, -0.1, 0);
-    else if (y < 240)
-        testCube.MoveBy(0, 0, -0.1);
-    else
-        testCube.MoveBy(0, 0, 0.1);
-    LOG("Position.Z");
-    LOG(testCube.GetPosition().getZ());
+    Camera::getCamera()->resetCamera();
 }
 
 void RenderingEngine2::SetRoll(float rad)
 {
     useRollPitchYaw = true;
-    roll = rad;
+    Camera::getCamera()->setRoll(rad);
 }
 void RenderingEngine2::SetPitch(float rad)
 {
     useRollPitchYaw = true;
-    pitch = rad;
+    Camera::getCamera()->setPitch(rad);
 }
 void RenderingEngine2::SetYaw(float rad)
 {
     useRollPitchYaw = true;
-    yaw = rad;
+    Camera::getCamera()->setYaw(rad);
 }
 
 Vertex RenderingEngine2::GetViewDirection() const
 {
+    Camera *cam = Camera::getCamera();
+    
     Vertex retValue;
     Matrix rotMatrix;
     static float xAxis []  = {1, 0, 0};
@@ -658,13 +650,13 @@ Vertex RenderingEngine2::GetViewDirection() const
 
     retValue.setPosition(0, 0, 1);
 
-    rotMatrix.makeRotationMatrix(yAxis, yaw);
+    rotMatrix.makeRotationMatrix(yAxis, cam->getYaw());
     retValue.multiplyByMatrix(rotMatrix);
 
-    rotMatrix.makeRotationMatrix(xAxis, pitch);
+    rotMatrix.makeRotationMatrix(xAxis, cam->getPitch());
     retValue.multiplyByMatrix(rotMatrix);
 
-    rotMatrix.makeRotationMatrix(zAxis, roll);
+    rotMatrix.makeRotationMatrix(zAxis, cam->getRoll());
     retValue.multiplyByMatrix(rotMatrix);
 
     return retValue;
