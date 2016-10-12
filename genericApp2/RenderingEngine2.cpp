@@ -173,6 +173,9 @@ void dotests()
 
     CameraTestSled cts;
     cts.test();
+
+    RenderContextTestSled rcts;
+    rcts.test();
 }
 IRenderingEngine* CreateRenderer2()
 {
@@ -641,23 +644,26 @@ void RenderingEngine2::SetYaw(float rad)
 Vertex RenderingEngine2::GetViewDirection() const
 {
     Camera *cam = Camera::getCamera();
-    
+
     Vertex retValue;
+    Vector4 transVect;
     Matrix rotMatrix;
     static float xAxis []  = {1, 0, 0};
     static float yAxis []  = {0, 1, 0};
     static float zAxis []  = {0, 0, 1};
 
-    retValue.setPosition(0, 0, 1);
+    transVect.set(0, 0, 1, 1);
 
     rotMatrix.makeRotationMatrix(yAxis, cam->getYaw());
-    retValue.multiplyByMatrix(rotMatrix);
+    transVect.multiplyByMatrix(rotMatrix);
 
     rotMatrix.makeRotationMatrix(xAxis, cam->getPitch());
-    retValue.multiplyByMatrix(rotMatrix);
+    transVect.multiplyByMatrix(rotMatrix);
 
     rotMatrix.makeRotationMatrix(zAxis, cam->getRoll());
-    retValue.multiplyByMatrix(rotMatrix);
+    transVect.multiplyByMatrix(rotMatrix);
+
+    retValue.setPosition(transVect.getX(), transVect.getY(), transVect.getZ());
 
     return retValue;
 }
@@ -676,8 +682,17 @@ void RenderingEngine2::GetWorldCoordFromScreenCoord(int screenX, int screenY, fl
     {
         Vertex near, far;
         // Return tapPos + viewDirection intersect with P(0,1,0,worldHeight)
-        near = RenderContext::getContext()->UnProject(screenX, 480-screenY, 0);
-        far = RenderContext::getContext()->UnProject(screenX, 480-screenY, 1);
+        near = RenderContext::getContext()->UnProject(screenX, RenderContext::getContext()->getHeight() - screenY, 0);
+        far = RenderContext::getContext()->UnProject(screenX,  RenderContext::getContext()->getHeight() - screenY, 1);
+
+        float lambda = near.getX() - near.getY()*(far.getX() - near.getX())/(near.getY() - far.getY());
+
+        Vertex delta(far);
+        delta.subtract(near);
+        delta.multiply(lambda);
+        Vertex point(near);
+        point.add(delta);
+        LOG(point.getX() << ", " << point.getY() << ", " << point.getZ());
     }
 }
 

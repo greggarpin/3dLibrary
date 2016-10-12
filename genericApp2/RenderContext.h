@@ -14,6 +14,7 @@
 #include "Matrix.h"
 #include "Vertex.h"
 #include "Stack.h"
+#include "TestSled.h"
 
 #define VERTEX_HANDLE_NONE -1
 #define MATRIX_STACK_SIZE 16
@@ -84,6 +85,13 @@ private:
     static RenderContext rc;
 
     Stack<Matrix*> matrixStack;
+};
+
+
+class RenderContextTestSled : public TestSled
+{
+public:
+    void test();
 };
 
 #endif /* defined(__genericApp2__RenderContext__) */

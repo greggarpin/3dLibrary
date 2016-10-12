@@ -47,13 +47,6 @@ void Vector::multiply(float scalar)
     els[2] *= scalar;
 }
 
-void Vector::multiplyByMatrix(const Matrix &m)
-{
-    set(getX() * m.get(0, 0) + getY() * m.get(0, 1) + getZ() * m.get(0, 2) + m.get(0, 3),
-        getX() * m.get(1, 0) + getY() * m.get(1, 1) + getZ() * m.get(1, 2) + m.get(1, 3),
-        getX() * m.get(2, 0) + getY() * m.get(2, 1) + getZ() * m.get(2, 2) + m.get(2, 3));
-}
-
 float Vector::dot(const Vector &v) const
 {
     return getX() * v.getX() + getY() * v.getY() + getZ() * v.getZ();
@@ -72,6 +65,38 @@ float Vector::distance(const Vector &other) const
 
     return sqrt(dx*dx + dy*dy + dz*dz);
 }
+
+
+Vector4::Vector4() : Vector()
+{
+    w_el = 1;
+}
+
+Vector4::Vector4(float x, float y, float z, float w) : Vector(x, y, z)
+{
+    w_el = w;
+}
+
+void Vector4::set(float x, float y, float z, float w)
+{
+    Vector::set(x, y, z);
+    w_el = w;
+}
+
+void Vector4::multiply(float scalar)
+{
+    Vector::multiply(scalar);
+    w_el *= scalar;
+}
+
+void Vector4::multiplyByMatrix(const Matrix &m)
+{
+    set(getX() * m.get(0, 0) + getY() * m.get(0, 1) + getZ() * m.get(0, 2) + m.get(0, 3),
+        getX() * m.get(1, 0) + getY() * m.get(1, 1) + getZ() * m.get(1, 2) + m.get(1, 3),
+        getX() * m.get(2, 0) + getY() * m.get(2, 1) + getZ() * m.get(2, 2) + m.get(2, 3),
+        getX() * m.get(3, 0) + getY() * m.get(3, 1) + getZ() * m.get(3, 2) + m.get(3, 3));
+}
+
 
 void VectorTestSled::test()
 {

@@ -183,6 +183,7 @@ void RenderContext::applyProjectionMatrix()
 
 Vertex RenderContext::UnProject(float screenX, float screenY, float screenZ) const
 {
+    // TODO::Return vector not vertex
     Vertex outVec;
     Matrix modelViewProj;
     Matrix inv;
@@ -198,8 +199,11 @@ Vertex RenderContext::UnProject(float screenX, float screenY, float screenZ) con
     viewport[2] = getWidth();
     viewport[3] = getHeight();
 
-    outVec.setPosition((2*(screenX - viewport[0])/viewport[2]) - 1, (2*(viewport[1] - screenY)/viewport[3]) - 1, 2*screenZ - 1);
-    outVec.multiplyByMatrix(inv);
+    Vector4 transVector((2*(screenX - viewport[0])/viewport[2]) - 1, (2*(screenY - viewport[1])/viewport[3]) - 1, 2*screenZ - 1, 1);
+    transVector.multiplyByMatrix(inv);
+    transVector.multiply(1.0/transVector.getW());
+
+    outVec.setPosition(transVector.getX(), transVector.getY(), transVector.getZ());
 
     return outVec;
 }
@@ -217,4 +221,24 @@ void RenderContext::popMatrix()
     assert(lastMatrix != NULL);
 
     modelviewMatrix.set(*lastMatrix);
+}
+
+void RenderContextTestSled::test()
+{
+    int oldWidth = RenderContext::getContext()->getWidth();
+    int oldHeight = RenderContext::getContext()->getHeight();
+
+    RenderContext::getMutableContext()->setWidth(100);
+    RenderContext::getMutableContext()->setHeight(100);
+
+    Vertex v = RenderContext::getContext()->UnProject(50, 50, 0);
+
+    test_fail_if(v.getX() != 0, "Unexpected X value");
+    test_fail_if(v.getY() != 0, "Unexpected Y value");
+    test_fail_if(v.getZ() != -1, "Unexpected Z value");
+
+    RenderContext::getMutableContext()->setWidth(oldWidth);
+    RenderContext::getMutableContext()->setHeight(oldHeight);
+
+    test_pass;
 }
