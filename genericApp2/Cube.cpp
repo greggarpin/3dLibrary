@@ -127,7 +127,6 @@ void Cube::render(RenderMode mode) const
 
 void Cube::setColor(float r, float g, float b)
 {
-    color.set(r, g, b);
     for (int i = 0; i < vertices.getNumVertices(); i++)
     {
         vertices[i].setColor(r, g, b);

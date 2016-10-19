@@ -129,12 +129,11 @@ private:
     void ApplyPerspective(float near, float far, float left, float right, float bottom, float top);
     void ApplyRotation() const;
     void InitializeCameraMatrix() const;
-    Vertex GetViewDirection() const;
+    Vector GetViewDirection() const;
     void GetWorldCoordFromScreenCoord(int screenX, int screenY, float worldHeight) const;
     void RenderObject(const IRenderable &obj) const;
     void selectPositionalObject(PositionalObject *obj);
     void deselectPositionalObject();
-    bool linesAreColinear(const Vector &l1p0, const Vector &l1p1, const Vector &l2p0, const Vector &l2p1);
     GLuint m_framebuffer;
     GLuint m_renderbuffer;
     GLuint m_depthbuffer;
@@ -432,49 +431,6 @@ void RenderingEngine2::onTouchStart(const TouchEvent &event)
 
 }
 
-bool RenderingEngine2::linesAreColinear(const Vector &l1p0, const Vector &l1p1, const Vector &l2p0, const Vector &l2p1)
-{
-    // Uses definition of a line as  {p : p = p0 + lambda(p1 - p0)}
-
-    const float nearlyZero = 0.1;
-
-    Vector l1Dir(l1p1);
-    l1Dir.subtract(l1p0);
-    float l1DirLen = l1Dir.length();
-
-    Vector l2Dir(l2p1);
-    l2Dir.subtract(l2p0);
-    float l2DirLen = l2Dir.length();
-
-    // If the lines aren't parallel, they aren't colinear
-    if (fabs(l1Dir.dot(l2Dir)) - (l1DirLen * l2DirLen) > nearlyZero)
-        return false;
-
-    // Knowing that the lines are parallel, we need only check that one point from the second line is part of the first line
-    // We do this by substituting l1p0 for p, l1p0 for p0 and l1p1 for p1 in the equation above and solving for lambda:
-    //     lambda  =    (p - p0)   =   (l2p0 - l1p0)
-    //                  -------        -------------
-    //                  (p1 - p0)      (l1p1 - l1p0)
-    //
-    // Using x values to calculate the above, we substitute back in to the original equation and check for a true
-    // statement when using y values:
-    // l2p0.y = l1p0.y + (l2p0.x - l1p0.x) * (l1p1.y - l1p0.y)
-    //                   -----------------
-    //                   (l1p1.x - l1p0.x)
-    //
-    // Rearranging we get:
-    // (l2p0.y - l1p0.y)(l1p1.x - l1p0.x) = (l2p0.x - l1p0.x) * (l1p1.y - l1p0.y)
-    //
-    // Or
-    // (l2p0.y - l1p0.y)(l1p1.x - l1p0.x) - (l2p0.x - l1p0.x) * (l1p1.y - l1p0.y) = 0
-    //
-    // Of course, we have already calculated l1p1 - l1p0 above, so:
-    // (l2p0.y - l1p0.y) * l1Dir.x - (l2p0.x - l1p0.x) * l1Dir.y = 0
-    float leftHandSide = (l2p0.getY() - l1p0.getY()) * l1Dir.getX() - (l2p0.getX() - l1p0.getX()) * l1Dir.getY();
-
-    return (fabs(leftHandSide) < nearlyZero);
-}
-
 void RenderingEngine2::onTouchMoved(const TouchEvent &event)
 {
     // If we haven't done a touchStart first
@@ -641,12 +597,11 @@ void RenderingEngine2::SetYaw(float rad)
     Camera::getCamera()->setYaw(rad);
 }
 
-Vertex RenderingEngine2::GetViewDirection() const
+Vector RenderingEngine2::GetViewDirection() const
 {
     Camera *cam = Camera::getCamera();
 
-    Vertex retValue;
-    Vector4 transVect;
+    Vector transVect;
     Matrix rotMatrix;
     static float xAxis []  = {1, 0, 0};
     static float yAxis []  = {0, 1, 0};
@@ -663,15 +618,13 @@ Vertex RenderingEngine2::GetViewDirection() const
     rotMatrix.makeRotationMatrix(zAxis, cam->getRoll());
     transVect.multiplyByMatrix(rotMatrix);
 
-    retValue.setPosition(transVect.getX(), transVect.getY(), transVect.getZ());
-
-    return retValue;
+    return transVect;
 }
 
 void RenderingEngine2::GetWorldCoordFromScreenCoord(int screenX, int screenY, float worldHeight) const
 {
-    const Vertex floorNormal(0, 1, 0);
-    Vertex view = GetViewDirection();
+    const Vector floorNormal(0, 1, 0);
+    Vector view = GetViewDirection();
 
     // If view direction is close to (less than 5 degrees from) perpendicular to (0,1,0), don't try to find floor intersection
     if (false && fabs(view.dot(floorNormal)) < 5.0 * PI/180.0)
@@ -680,17 +633,17 @@ void RenderingEngine2::GetWorldCoordFromScreenCoord(int screenX, int screenY, fl
     }
     else
     {
-        Vertex near, far;
+        Vector near, far;
         // Return tapPos + viewDirection intersect with P(0,1,0,worldHeight)
         near = RenderContext::getContext()->UnProject(screenX, RenderContext::getContext()->getHeight() - screenY, 0);
         far = RenderContext::getContext()->UnProject(screenX,  RenderContext::getContext()->getHeight() - screenY, 1);
 
         float lambda = near.getX() - near.getY()*(far.getX() - near.getX())/(near.getY() - far.getY());
 
-        Vertex delta(far);
+        Vector delta(far);
         delta.subtract(near);
         delta.multiply(lambda);
-        Vertex point(near);
+        Vector point(near);
         point.add(delta);
         LOG(point.getX() << ", " << point.getY() << ", " << point.getZ());
     }

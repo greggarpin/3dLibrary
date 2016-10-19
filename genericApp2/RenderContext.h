@@ -69,7 +69,7 @@ public:
     Matrix modelviewMatrix;
     Matrix projectionMatrix;
 
-    Vertex UnProject(float screenX, float screenY, float screenZ) const;
+    Vector UnProject(float screenX, float screenY, float screenZ) const;
 
 private:
     // Singleton - no public constructor

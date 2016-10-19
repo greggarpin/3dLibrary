@@ -4,33 +4,35 @@
 
 Vector::Vector()
 {
-    set(0, 0, 0);
+    set(0, 0, 0, 1);
 }
 
-Vector::Vector(float x, float y, float z)
+Vector::Vector(float x, float y, float z, float w)
 {
-    set(x, y, z);
+    set(x, y, z, w);
 }
 
 bool Vector::operator==(const Vector &v) const
 {
     return  getX() == v.getX() &&
             getY() == v.getY() &&
-            getZ() == v.getZ();
+            getZ() == v.getZ() &&
+            getW() == v.getW();
 }
 
 Vector& Vector::operator=(const Vector &v)
 {
-    set(v.getX(), v.getY(), v.getZ());
+    set(v.getX(), v.getY(), v.getZ(), v.getW());
 
     return *this;
 }
 
-void Vector::set(float x, float y, float z)
+void Vector::set(float x, float y, float z, float w)
 {
     els[0] = x;
     els[1] = y;
     els[2] = z;
+    els[3] = w;
 }
 
 void Vector::add(float x, float y, float z)
@@ -66,35 +68,12 @@ float Vector::distance(const Vector &other) const
     return sqrt(dx*dx + dy*dy + dz*dz);
 }
 
-
-Vector4::Vector4() : Vector()
+void Vector::multiplyByMatrix(const Matrix &m)
 {
-    w_el = 1;
-}
-
-Vector4::Vector4(float x, float y, float z, float w) : Vector(x, y, z)
-{
-    w_el = w;
-}
-
-void Vector4::set(float x, float y, float z, float w)
-{
-    Vector::set(x, y, z);
-    w_el = w;
-}
-
-void Vector4::multiply(float scalar)
-{
-    Vector::multiply(scalar);
-    w_el *= scalar;
-}
-
-void Vector4::multiplyByMatrix(const Matrix &m)
-{
-    set(getX() * m.get(0, 0) + getY() * m.get(0, 1) + getZ() * m.get(0, 2) + m.get(0, 3),
-        getX() * m.get(1, 0) + getY() * m.get(1, 1) + getZ() * m.get(1, 2) + m.get(1, 3),
-        getX() * m.get(2, 0) + getY() * m.get(2, 1) + getZ() * m.get(2, 2) + m.get(2, 3),
-        getX() * m.get(3, 0) + getY() * m.get(3, 1) + getZ() * m.get(3, 2) + m.get(3, 3));
+    set(getX() * m.get(0, 0) + getY() * m.get(0, 1) + getZ() * m.get(0, 2) + getW() * m.get(0, 3),
+        getX() * m.get(1, 0) + getY() * m.get(1, 1) + getZ() * m.get(1, 2) + getW() * m.get(1, 3),
+        getX() * m.get(2, 0) + getY() * m.get(2, 1) + getZ() * m.get(2, 2) + getW() * m.get(2, 3),
+        getX() * m.get(3, 0) + getY() * m.get(3, 1) + getZ() * m.get(3, 2) + getW() * m.get(3, 3));
 }
 
 
@@ -117,7 +96,7 @@ void VectorTestSled::test()
     test_fail_if(expDp != vwDp, "vwDp unexpected dot product");
     test_fail_if(vvDp != vwDp, "vvDP unexpected dot product");
 
-    test_fail_if(fabs(v.length() - sqrt(14)) > 0.000001, "Incorrect length of vector v");
+    test_fail_if(fabs(v.length() - sqrt(14)) > 0.000001, "Incorrect length of Vector v");
     test_fail_if(fabs(v.distance(w)) > 0.000001, "Incorrect distance between v and w - expected 0");
 
     test_pass;
