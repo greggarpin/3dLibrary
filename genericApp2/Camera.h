@@ -10,6 +10,7 @@
 #define __genericApp2__Camera__
 
 #include "TestSled.h"
+#include "Vector.h"
 
 class Camera
 {
@@ -18,6 +19,7 @@ public:
 
     void resetCamera();
 
+    inline const Vector& getPosition() const { return pos; };
     float getPositionX() const;
     void setPositionX(float x);
     void increasePositionX(float deltaX);
@@ -47,7 +49,7 @@ private:
 
     static Camera *s_camera;
 
-    float pos[3];
+    Vector pos;
     float rot[3];
 };
 

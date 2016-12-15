@@ -28,54 +28,53 @@ Camera *Camera::getCamera()
 
 void Camera::resetCamera()
 {
-    pos[0] = 0;
-    pos[1] = 5;
-    pos[2] = 0;
+    pos.set(0, 5, 0);
     rot[0] = rot[1] = rot[2] = 0;
 }
 
 float Camera::getPositionX() const
 {
-    return pos[0];
+    return pos.getX();
 }
 
 void Camera::setPositionX(float x)
 {
-    pos[0] = x;
+    pos.setX(x);
 }
 
 void Camera::increasePositionX(float deltaX)
 {
-    pos[0] += deltaX;
+    pos.setX(pos.getX() + deltaX);
 }
 
 float Camera::getPositionY() const
 {
-    return pos[1];
+    return pos.getY();
 }
 
 void Camera::setPositionY(float y)
 {
-    pos[1] = y;
+    pos.setY(y);
 }
 
 void Camera::increasePositionY(float deltaY)
 {
-    pos[1] += deltaY;
+    pos.setY(pos.getY() + deltaY);
 }
 
 float Camera::getPositionZ() const
 {
-    return pos[2];
+    return pos.getZ();
 }
+
 void Camera::setPositionZ(float z)
 {
-    pos[2] = z;
+    pos.setZ(z);
 }
 
 void Camera::increasePositionZ(float deltaZ)
 {
-    pos[2] += deltaZ;
+    pos.setZ(pos.getZ() + deltaZ);
 }
 
 float Camera::getYaw() const

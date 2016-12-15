@@ -31,12 +31,17 @@ public:
     inline const Vector& getColor() const { return color; };
     inline void setColor(float r, float g, float b, float a = 1) { color.set(r, g, b, a); }
 
+    inline const float* getTextureCoordPointer() const { return textureCoord.getPointer(); }
+    inline const Vector& getTextureCoord() const { return textureCoord; };
+    inline void setTextureCoord(float u, float v) { textureCoord.set(u, v, 0, 0); }
+
     Vertex& operator=(const Vertex &v);
 
 private:
     Vector position;
     Vector color;
     Vector normal;
+    Vector textureCoord;
 };
 
 class VertexList
@@ -48,6 +53,7 @@ public:
     inline const float *getPositionPointer() const { return vertices[0].getPositionPointer(); }
     inline const float *getColorPointer() const { return vertices[0].getColorPointer(); }
     inline const float *getNormalPointer() const { return vertices[0].getNormalPointer(); }
+    inline const float *getTextureCoordPointer() const { return vertices[0].getTextureCoordPointer(); }
 
     void setSize(unsigned int size);
 

@@ -1,0 +1,16 @@
+* Support adding new objects to the center of the screen
+* Way to delete objects
+* Cleanup/refactor RenderingEngine2
+* Delete RenderingEngine1
+* Rename RenderingEngine2 to something meaningful
+* Allow move object in response to device movement
+* Buttons for navigation, etc. (should cover everything in case not on a mobile device)
+* Add texturing to shapes
+* Support for externally defined shapes (ASE files?)
+* Ability to save scene 
+* Decide on and use coding standards
+* * Use references or pointers?
+* * Capitalization/casing schemes
+* Fix memory issues
+* Port to Android
+* Add compass overlay (only during movements?)

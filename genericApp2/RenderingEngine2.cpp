@@ -21,6 +21,7 @@
 #include "Util.h"
 #include "TouchEvent.h"
 #include "Camera.h"
+#include "List.h"
 
 #define STRINGIFY(A) #A
 #include "shaders/Simple.vert"
@@ -101,6 +102,7 @@ ShaderProgram *ShaderProgram::activeProgram = NULL;
 class RenderingEngine2 : public IRenderingEngine {
 public:
     RenderingEngine2();
+    ~RenderingEngine2();
     void Initialize(int width, int height);
     void Render() const;
     void UpdateAnimation(float timeStep) {}
@@ -134,6 +136,9 @@ private:
     void RenderObject(const IRenderable &obj) const;
     void selectPositionalObject(PositionalObject *obj);
     void deselectPositionalObject();
+    void addObject(IRenderable *obj);
+    void addNewObject();
+
     GLuint m_framebuffer;
     GLuint m_renderbuffer;
     GLuint m_depthbuffer;
@@ -146,8 +151,7 @@ private:
     Polygon testPolygon;
 mutable    Cube testCube;
     Cube tc[10];
-    IRenderable **renderableObjs;
-    unsigned int numRenderableObjs;
+    List<IRenderable *>renderableObjs;
     PositionalObject *selectedPositionalObject;
 
     TouchEventList touchList;
@@ -185,7 +189,7 @@ IRenderingEngine* CreateRenderer2()
     return new RenderingEngine2();
 }
 
-RenderingEngine2::RenderingEngine2() : numRenderableObjs(0), selectedPositionalObject(NULL)
+RenderingEngine2::RenderingEngine2() : selectedPositionalObject(NULL)
 {
     glGenFramebuffers(1, &m_framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
@@ -197,9 +201,8 @@ RenderingEngine2::RenderingEngine2() : numRenderableObjs(0), selectedPositionalO
     touchStarted = false;
     numTouchMoves = 0;
     useRollPitchYaw = true;
-
-    renderableObjs = new IRenderable*[numRenderableObjs++];
-    renderableObjs[0] = &testCube;
+//return;
+    addObject(&testCube);
     int i = 0;
     tc[i++].SetPosition(-3, 0, -2);
     tc[i++].SetPosition( 3, 0, -2);
@@ -209,11 +212,23 @@ RenderingEngine2::RenderingEngine2() : numRenderableObjs(0), selectedPositionalO
     tc[i++].SetPosition(0, 0,  3);
     for (unsigned int j = 0; j < i; j++)
     {
-        renderableObjs[numRenderableObjs++] = &tc[j];
+  //      addObject(&tc[j]);
     }
 
     testCube.SetPosition(0, 0, -2);
     testCube.SetRotation(PI/2, 0, 0);
+}
+
+RenderingEngine2::~RenderingEngine2()
+{
+    // TODO:: Deallocate items in renderableobjs list
+}
+
+void RenderingEngine2::addObject(IRenderable *obj)
+{
+    assert(obj != NULL);
+
+    renderableObjs.append(obj);
 }
 
 void RenderingEngine2::Initialize(int width, int height)
@@ -290,10 +305,12 @@ void RenderingEngine2::Render() const
 
     Landscape::getLandscape()->render(renderMode);
 
-    for (unsigned int i = 0; i < numRenderableObjs; i++)
+    for (unsigned int i = 0; i < renderableObjs.getNumItems(); i++)
     {
-        if (renderableObjs[i] != NULL)
-            RenderObject(*renderableObjs[i]);
+        IRenderable *curObj = renderableObjs.getAt(i);
+
+        if (curObj != NULL)
+            RenderObject(*curObj);
     }
     if (testRotation)
         testCube.RotateBy(0.01, 0.01, 0);
@@ -576,9 +593,27 @@ void RenderingEngine2::deselectPositionalObject()
     selectedPositionalObject = NULL;
 }
 
+void RenderingEngine2::addNewObject()
+{
+    const float distanceFromCamera = 2;
+    Vector objectOrigin = GetViewDirection();
+    const Vector &camPos = Camera::getCamera()->getPosition();
+    objectOrigin.multiply(-distanceFromCamera);
+    LOG("VD\t" << objectOrigin.getX() << ", " << objectOrigin.getY() << ", " << objectOrigin.getZ());
+    objectOrigin.add(camPos);
+    LOG("CP\t" << camPos.getX() << ", " << camPos.getY() << ", " << camPos.getZ());
+
+    Cube *newCube = new Cube();
+    newCube->SetPosition(objectOrigin);
+    LOG("pos\t" << objectOrigin.getX() << ", " << objectOrigin.getY() << ", " << objectOrigin.getZ());
+
+    addObject(newCube);
+}
+
 void RenderingEngine2::onTap(int x, int y)
 {
-    Camera::getCamera()->resetCamera();
+///    Camera::getCamera()->resetCamera();
+    addNewObject();
 }
 
 void RenderingEngine2::SetRoll(float rad)
@@ -609,13 +644,13 @@ Vector RenderingEngine2::GetViewDirection() const
 
     transVect.set(0, 0, 1, 1);
 
-    rotMatrix.makeRotationMatrix(yAxis, cam->getYaw());
+    rotMatrix.makeRotationMatrix(yAxis, -cam->getYaw());
     transVect.multiplyByMatrix(rotMatrix);
 
-    rotMatrix.makeRotationMatrix(xAxis, cam->getPitch());
+    rotMatrix.makeRotationMatrix(xAxis, -cam->getPitch());
     transVect.multiplyByMatrix(rotMatrix);
 
-    rotMatrix.makeRotationMatrix(zAxis, cam->getRoll());
+    rotMatrix.makeRotationMatrix(zAxis, -cam->getRoll());
     transVect.multiplyByMatrix(rotMatrix);
 
     return transVect;

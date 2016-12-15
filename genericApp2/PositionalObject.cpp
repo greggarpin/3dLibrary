@@ -26,6 +26,12 @@ void PositionalObject::PostRender(RenderMode mode) const
     RenderContext::getMutableContext()->popMatrix();
 }
 
+void PositionalObject::SetPosition(const Vector &newPos)
+{
+    position = newPos;
+    UpdateTransformMatrix();
+}
+
 void PositionalObject::SetPosition(float x, float y, float z)
 {
     position.set(x, y, z);
@@ -35,6 +41,12 @@ void PositionalObject::SetPosition(float x, float y, float z)
 void PositionalObject::MoveBy(float x, float y, float z)
 {
     position.add(x, y, z);
+    UpdateTransformMatrix();
+}
+
+void PositionalObject::SetRotation(const Vector &newRot)
+{
+    rotation = newRot;
     UpdateTransformMatrix();
 }
 

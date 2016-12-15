@@ -18,11 +18,13 @@ public:
     void PreRender(RenderMode mode) const;
     void PostRender(RenderMode mode) const;
 
+    void SetPosition(const Vector &newPos);
     void SetPosition(float x, float y, float z);
     const Vector &GetPosition() const { return position; };
     void MoveBy(float x, float y, float z);
 
     // Rotations in radians
+    void SetRotation(const Vector &newRot);
     void SetRotation(float xRot, float yRot, float zRot);
     const Vector &GetRotation() const { return rotation; };
     void RotateBy(float xRot, float yRot, float zRot);
