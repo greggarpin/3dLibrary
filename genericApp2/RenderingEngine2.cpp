@@ -142,6 +142,8 @@ private:
     GLuint m_framebuffer;
     GLuint m_renderbuffer;
     GLuint m_depthbuffer;
+    GLuint m_textureHandle;
+
     ShaderProgram normalProgram;
     float xRot, yRot, zRot;
     bool useRollPitchYaw;
@@ -247,6 +249,16 @@ void RenderingEngine2::Initialize(int width, int height)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
+    char textureBits[8*4*64];
+    memset(textureBits, 0, sizeof(textureBits));
+    for (int i = 0; i < 8*4*64; i += 4)
+        textureBits[i] = 255;
+    glGenTextures(1, &m_textureHandle);
+    glBindTexture(GL_TEXTURE_2D, m_textureHandle);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 8, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureBits);
+
     RenderContext::getMutableContext()->setWidth(width);
     RenderContext::getMutableContext()->setHeight(height);
 
@@ -276,12 +288,15 @@ void RenderingEngine2::Render() const
     GLuint positionSlot;
     GLuint colorSlot;
     GLuint normalSlot;
+    GLuint textureSlot;
     if (renderMode == selection)
     {
     }
+    // TODO:: All of this should be moved into RenderContext
     positionSlot = ShaderProgram::GetActiveProgram()->GetAttribLocation("Position");
     colorSlot = ShaderProgram::GetActiveProgram()->GetAttribLocation("SourceColor");
     normalSlot = ShaderProgram::GetActiveProgram()->GetAttribLocation("Normal");
+    textureSlot = ShaderProgram::GetActiveProgram()->GetAttribLocation("TextureCoord");
 
     if (renderMode == selection)
     {
@@ -294,8 +309,13 @@ void RenderingEngine2::Render() const
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     RenderContext::getMutableContext()->setPositionHandle(positionSlot);
+    RenderContext::getMutableContext()->enablePositionHandle();
     RenderContext::getMutableContext()->setColorHandle(colorSlot);
+    RenderContext::getMutableContext()->enableColorHandle();
     RenderContext::getMutableContext()->setNormalHandle(normalSlot);
+    RenderContext::getMutableContext()->enableNormalHandle();
+    RenderContext::getMutableContext()->setTextureCoordHandle(textureSlot);
+    RenderContext::getMutableContext()->disableTexturing();
 
     RenderContext::getMutableContext()->enableLighting();
     RenderContext::getMutableContext()->applyLightColor(1, 1, 1);

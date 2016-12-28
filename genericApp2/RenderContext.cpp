@@ -12,11 +12,6 @@
 
 RenderContext RenderContext::rc;
 
-bool RenderContext::isValid() const
-{
-    return positionHandle != VERTEX_HANDLE_NONE && colorHandle != VERTEX_HANDLE_NONE;
-}
-
 void RenderContext::setProgramHandle(GLuint handle)
 {
     programHandle = handle;
@@ -25,63 +20,6 @@ void RenderContext::setProgramHandle(GLuint handle)
 GLuint RenderContext::getProgramHandle() const
 {
     return programHandle;
-}
-
-GLuint RenderContext::getPositionHandle() const
-{
-    return positionHandle;
-}
-
-void RenderContext::setPositionHandle(GLuint handle)
-{
-    if (handle != VERTEX_HANDLE_NONE)
-    {
-        glEnableVertexAttribArray(handle);
-    }
-    else if (positionHandle != VERTEX_HANDLE_NONE)
-    {
-        glDisable(positionHandle);
-    }
-
-    positionHandle = handle;
-}
-
-GLuint RenderContext::getColorHandle() const
-{
-    return colorHandle;
-}
-
-void RenderContext::setColorHandle(GLuint handle)
-{
-    if (handle != VERTEX_HANDLE_NONE)
-    {
-        glEnableVertexAttribArray(handle);
-    }
-    else if (colorHandle != VERTEX_HANDLE_NONE)
-    {
-        glDisable(colorHandle);
-    }
-
-    colorHandle = handle;
-}
-
-void RenderContext::setNormalHandle(GLuint handle)
-{
-    if (handle != VERTEX_HANDLE_NONE)
-    {
-        glEnableVertexAttribArray(handle);
-    }
-    else if (normalHandle != VERTEX_HANDLE_NONE)
-    {
-        glDisable(normalHandle);
-    }
-
-    normalHandle = handle;
-}
-
-GLuint RenderContext::getNormalHandle() const
-{
-    return normalHandle;
 }
 
 #define intPartToFloat(intVal, bitShift) (((intVal >> bitShift) & 0x000000FF)/255.0)
@@ -166,6 +104,21 @@ void RenderContext::applyLightPosition(float x, float y, float z, bool normalize
     }
 
     glUniform3f(lightDirUniform, x, y, z);
+}
+
+void RenderContext::enableTexturing(bool enable) const
+{
+    GLint texturingToggle = glGetUniformLocation(programHandle, "EnableTexturing");
+    if (enable)
+    {
+        glUniform1f(texturingToggle, 1.0);
+        enableTextureCoordHandle();
+    }
+    else
+    {
+        glUniform1f(texturingToggle, 0.0);
+        disableTextureCoordHandle();
+    }
 }
 
 void RenderContext::enableLighting(bool enable) const

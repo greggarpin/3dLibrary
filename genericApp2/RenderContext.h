@@ -19,6 +19,21 @@
 #define VERTEX_HANDLE_NONE -1
 #define MATRIX_STACK_SIZE 16
 
+class VertexAttribHandle
+{
+public:
+    inline VertexAttribHandle() { handle = VERTEX_HANDLE_NONE; };
+
+    inline void set(GLint pHandle) { handle = pHandle; };
+    inline GLint get() const { return handle; };
+
+    inline void enable() const { if (handle != VERTEX_HANDLE_NONE) glEnableVertexAttribArray(handle); };
+    inline void disable() const { if (handle != VERTEX_HANDLE_NONE) glDisable(handle); };
+
+private:
+    GLint handle;
+};
+
 class RenderContext
 {
 public:
@@ -35,14 +50,25 @@ public:
     void setProgramHandle(GLuint program);
     GLuint getProgramHandle() const;
 
-    void setPositionHandle(GLuint handle);
-    GLuint getPositionHandle() const;
+    inline void setPositionHandle(GLuint handle) { positionHandle.set(handle); };
+    inline GLuint getPositionHandle() const { return positionHandle.get(); };
+    inline void enablePositionHandle() const { positionHandle.enable(); };
+    inline void disablePositionHandle() const { positionHandle.disable(); };
 
-    void setColorHandle(GLuint handle);
-    GLuint getColorHandle() const;
+    inline void setColorHandle(GLuint handle) { colorHandle.set(handle); };
+    inline GLuint getColorHandle() const { return colorHandle.get(); };
+    inline void enableColorHandle() const { colorHandle.enable(); };
+    inline void disableColorHandle() const { colorHandle.disable(); };
 
-    void setNormalHandle(GLuint handle);
-    GLuint getNormalHandle() const;
+    inline void setNormalHandle(GLuint handle) { normalHandle.set(handle); };
+    inline GLuint getNormalHandle() const { return normalHandle.get(); };
+    inline void enableNormalHandle() const { normalHandle.enable(); };
+    inline void disableNormalHandle() const { normalHandle.disable(); };
+
+    inline void setTextureCoordHandle(GLuint handle) { textureCoordHandle.set(handle); };
+    inline GLuint getTextureCoordHandle() const { return textureCoordHandle.get(); };
+    inline void enableTextureCoordHandle() const { textureCoordHandle.enable(); };
+    inline void disableTextureCoordHandle() const { textureCoordHandle.disable(); };
 
     void setWidth(int width);
     int getWidth() const;
@@ -50,16 +76,17 @@ public:
     void setHeight(int height);
     int getHeight() const;
 
-    bool isValid() const;
-
     void applyModelviewMatrix();
     void applyProjectionMatrix();
     void applySelectionId(unsigned int selectionId);
     void applyLightColor(float r, float g, float b) const;
     void applyLightPosition(float x, float y, float z, bool normalize) const;
 
+    void enableTexturing(bool enable = true) const;
+    inline void disableTexturing() const { enableTexturing(false); }
+
     void enableLighting(bool enable = true) const;
-    void disableLighting() const { enableLighting(false); }
+    inline void disableLighting() const { enableLighting(false); }
 
     unsigned int getSelectionIdAt(unsigned int x, unsigned int y) const;
 
@@ -73,12 +100,13 @@ public:
 
 private:
     // Singleton - no public constructor
-    RenderContext() : positionHandle(0), colorHandle(0), matrixStack(MATRIX_STACK_SIZE) {};
+    RenderContext() : matrixStack(MATRIX_STACK_SIZE) {};
 
     GLuint programHandle;
-    GLuint positionHandle;
-    GLuint colorHandle;
-    GLuint normalHandle;
+    VertexAttribHandle positionHandle;
+    VertexAttribHandle colorHandle;
+    VertexAttribHandle normalHandle;
+    VertexAttribHandle textureCoordHandle;
 
     int width, height;
 
@@ -86,7 +114,6 @@ private:
 
     Stack<Matrix*> matrixStack;
 };
-
 
 class RenderContextTestSled : public TestSled
 {

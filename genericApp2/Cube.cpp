@@ -15,40 +15,40 @@ Cube::Cube() : vertices(24)
     int v = 0;
 
     // Back face
-    vertices[v].setPosition(-size,  size, -size); vertices[v++].setNormal(0, 0, -1);
-    vertices[v].setPosition(-size, -size, -size); vertices[v++].setNormal(0, 0, -1);
-    vertices[v].setPosition( size, -size, -size); vertices[v++].setNormal(0, 0, -1);
-    vertices[v].setPosition( size,  size, -size); vertices[v++].setNormal(0, 0, -1);
+    vertices[v].setPosition(-size,  size, -size); vertices[v].setNormal(0, 0, -1); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition(-size, -size, -size); vertices[v].setNormal(0, 0, -1); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition( size, -size, -size); vertices[v].setNormal(0, 0, -1); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition( size,  size, -size); vertices[v].setNormal(0, 0, -1); vertices[v].setTextureCoord(0, 0); v++;
 
     // Front face
-    vertices[v].setPosition( size,  size,  size); vertices[v++].setNormal(0, 0, 1);
-    vertices[v].setPosition( size, -size,  size); vertices[v++].setNormal(0, 0, 1);
-    vertices[v].setPosition(-size, -size,  size); vertices[v++].setNormal(0, 0, 1);
-    vertices[v].setPosition(-size,  size,  size); vertices[v++].setNormal(0, 0, 1);
+    vertices[v].setPosition( size,  size,  size); vertices[v].setNormal(0, 0, 1); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition( size, -size,  size); vertices[v].setNormal(0, 0, 1); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition(-size, -size,  size); vertices[v].setNormal(0, 0, 1); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition(-size,  size,  size); vertices[v].setNormal(0, 0, 1); vertices[v].setTextureCoord(0, 0); v++;
 
     // Left face
-    vertices[v].setPosition(-size,  size,  size); vertices[v++].setNormal(-1, 0, 0);
-    vertices[v].setPosition(-size, -size,  size); vertices[v++].setNormal(-1, 0, 0);
-    vertices[v].setPosition(-size, -size, -size); vertices[v++].setNormal(-1, 0, 0);
-    vertices[v].setPosition(-size,  size, -size); vertices[v++].setNormal(-1, 0, 0);
+    vertices[v].setPosition(-size,  size,  size); vertices[v].setNormal(-1, 0, 0); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition(-size, -size,  size); vertices[v].setNormal(-1, 0, 0); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition(-size, -size, -size); vertices[v].setNormal(-1, 0, 0); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition(-size,  size, -size); vertices[v].setNormal(-1, 0, 0); vertices[v].setTextureCoord(0, 0); v++;
 
     // Right face
-    vertices[v].setPosition( size,  size, -size); vertices[v++].setNormal(1, 0, 0);
-    vertices[v].setPosition( size, -size, -size); vertices[v++].setNormal(1, 0, 0);
-    vertices[v].setPosition( size, -size,  size); vertices[v++].setNormal(1, 0, 0);
-    vertices[v].setPosition( size,  size,  size); vertices[v++].setNormal(1, 0, 0);
+    vertices[v].setPosition( size,  size, -size); vertices[v].setNormal(1, 0, 0); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition( size, -size, -size); vertices[v].setNormal(1, 0, 0); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition( size, -size,  size); vertices[v].setNormal(1, 0, 0); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition( size,  size,  size); vertices[v].setNormal(1, 0, 0); vertices[v].setTextureCoord(0, 0); v++;
 
     // Bottom face
-    vertices[v].setPosition(-size, -size, -size); vertices[v++].setNormal(0, -1, 0);
-    vertices[v].setPosition(-size, -size,  size); vertices[v++].setNormal(0, -1, 0);
-    vertices[v].setPosition( size, -size,  size); vertices[v++].setNormal(0, -1, 0);
-    vertices[v].setPosition( size, -size, -size); vertices[v++].setNormal(0, -1, 0);
+    vertices[v].setPosition(-size, -size, -size); vertices[v].setNormal(0, -1, 0); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition(-size, -size,  size); vertices[v].setNormal(0, -1, 0); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition( size, -size,  size); vertices[v].setNormal(0, -1, 0); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition( size, -size, -size); vertices[v].setNormal(0, -1, 0); vertices[v].setTextureCoord(0, 0); v++;
 
     // Top face
-    vertices[v].setPosition( size,  size, -size); vertices[v++].setNormal(0, 1, 0);
-    vertices[v].setPosition( size,  size,  size); vertices[v++].setNormal(0, 1, 0);
-    vertices[v].setPosition(-size,  size,  size); vertices[v++].setNormal(0, 1, 0);
-    vertices[v].setPosition(-size,  size, -size); vertices[v++].setNormal(0, 1, 0);
+    vertices[v].setPosition( size,  size, -size); vertices[v].setNormal(0, 1, 0); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition( size,  size,  size); vertices[v].setNormal(0, 1, 0); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition(-size,  size,  size); vertices[v].setNormal(0, 1, 0); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition(-size,  size, -size); vertices[v].setNormal(0, 1, 0); vertices[v].setTextureCoord(0, 0); v++;
 
     setColor(0, 0, 1);
 /* // Color back face
@@ -117,10 +117,14 @@ void Cube::render(RenderMode mode) const
                                             };
 
         RenderContext::getContext()->enableLighting();
+        RenderContext::getContext()->enableTexturing();
 
         glVertexAttribPointer(RenderContext::getContext()->getColorHandle(), 4, GL_FLOAT, GL_FALSE, vertices.getStride(), vertices.getColorPointer());
         glVertexAttribPointer(RenderContext::getContext()->getNormalHandle(), 3, GL_FLOAT, GL_FALSE, vertices.getStride(), vertices.getNormalPointer());
+        glVertexAttribPointer(RenderContext::getContext()->getTextureCoordHandle(), 2, GL_FLOAT, GL_FALSE, vertices.getStride(), vertices.getTextureCoordPointer());
         glDrawElements(GL_TRIANGLES, sizeof(solidIndices)/sizeof(GLushort), GL_UNSIGNED_SHORT, solidIndices);
+
+        RenderContext::getContext()->disableTexturing();
     }
     renderNormals();
 }
