@@ -7,11 +7,17 @@ uniform lowp vec3 LightPosition;
 uniform lowp vec3 LightColor;
 uniform highp float EnableTexturing;
 uniform highp float EnableLighting;
+uniform highp float SelectionModeOn;
 
 uniform sampler2D Sampler;
 
 void main(void)
 {
+    if (SelectionModeOn == 1.0)
+    {
+        gl_FragColor = DestinationColor;
+        return;
+    }
     if (EnableLighting == 0.0)
     {
         gl_FragColor = DestinationColor;

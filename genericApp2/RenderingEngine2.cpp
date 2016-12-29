@@ -124,6 +124,8 @@ public:
     void onTouchEnd(int x, int y);
     void onTap(int x, int y);
 
+    void addTextureImage(const void* imageBytesRGBA, unsigned int width, unsigned int height);
+
 private:
     GLuint BuildShader(const char *source, GLenum shaderType) const;
     GLuint BuildProgram(const char *vertShader, const char *fragShader) const;
@@ -249,15 +251,10 @@ void RenderingEngine2::Initialize(int width, int height)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    char textureBits[8*4*64];
-    memset(textureBits, 0, sizeof(textureBits));
-    for (int i = 0; i < 8*4*64; i += 4)
-        textureBits[i] = 255;
     glGenTextures(1, &m_textureHandle);
     glBindTexture(GL_TEXTURE_2D, m_textureHandle);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 8, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureBits);
 
     RenderContext::getMutableContext()->setWidth(width);
     RenderContext::getMutableContext()->setHeight(height);
@@ -289,9 +286,7 @@ void RenderingEngine2::Render() const
     GLuint colorSlot;
     GLuint normalSlot;
     GLuint textureSlot;
-    if (renderMode == selection)
-    {
-    }
+
     // TODO:: All of this should be moved into RenderContext
     positionSlot = ShaderProgram::GetActiveProgram()->GetAttribLocation("Position");
     colorSlot = ShaderProgram::GetActiveProgram()->GetAttribLocation("SourceColor");
@@ -301,10 +296,12 @@ void RenderingEngine2::Render() const
     if (renderMode == selection)
     {
         glClearColor(0, 0, 0, 0);
+        RenderContext::getMutableContext()->enableSelectionMode();
     }
     else
     {
         glClearColor(0.2,0.8,0.8,1);
+        RenderContext::getMutableContext()->disableSelectionMode();
     }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -608,7 +605,7 @@ void RenderingEngine2::deselectPositionalObject()
 {
     Cube *c = dynamic_cast<Cube*>(selectedPositionalObject);
     if (c != NULL)
-        c->setColor(0, 0, 1);
+        c->setColor(0, 0, 0);
     
     selectedPositionalObject = NULL;
 }
@@ -702,5 +699,10 @@ void RenderingEngine2::GetWorldCoordFromScreenCoord(int screenX, int screenY, fl
         point.add(delta);
         LOG(point.getX() << ", " << point.getY() << ", " << point.getZ());
     }
+}
+
+void RenderingEngine2::addTextureImage(const void* imageBytesRGBA, unsigned int width, unsigned int height)
+{
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageBytesRGBA);
 }
 

@@ -127,6 +127,12 @@ void RenderContext::enableLighting(bool enable) const
     glUniform1f(lightingToggle, (enable ? 1.0 : 0.0));
 }
 
+void RenderContext::enableSelectionMode(bool enable) const
+{
+    GLint selectionToggle = glGetUniformLocation(programHandle, "SelectionModeOn");
+    glUniform1f(selectionToggle, (enable ? 1.0 : 0.0));
+}
+
 void RenderContext::applyProjectionMatrix()
 {
     GLint projectionUniform = glGetUniformLocation(programHandle, "Projection");

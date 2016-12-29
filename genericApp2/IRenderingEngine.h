@@ -46,6 +46,8 @@ struct IRenderingEngine {
     virtual void onTouchMoved(const TouchEvent &event) = 0;
     virtual void onTouchEnd(const TouchEvent &event) = 0;
 
+    virtual void addTextureImage(const void* imageBytesRGBA, unsigned int width, unsigned int height) = 0;
+
     virtual ~IRenderingEngine() {}
 };
 #endif

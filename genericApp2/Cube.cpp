@@ -15,42 +15,42 @@ Cube::Cube() : vertices(24)
     int v = 0;
 
     // Back face
-    vertices[v].setPosition(-size,  size, -size); vertices[v].setNormal(0, 0, -1); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition(-size,  size, -size); vertices[v].setNormal(0, 0, -1); vertices[v].setTextureCoord(0, 1); v++;
     vertices[v].setPosition(-size, -size, -size); vertices[v].setNormal(0, 0, -1); vertices[v].setTextureCoord(0, 0); v++;
-    vertices[v].setPosition( size, -size, -size); vertices[v].setNormal(0, 0, -1); vertices[v].setTextureCoord(0, 0); v++;
-    vertices[v].setPosition( size,  size, -size); vertices[v].setNormal(0, 0, -1); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition( size, -size, -size); vertices[v].setNormal(0, 0, -1); vertices[v].setTextureCoord(1, 0); v++;
+    vertices[v].setPosition( size,  size, -size); vertices[v].setNormal(0, 0, -1); vertices[v].setTextureCoord(1, 1); v++;
 
     // Front face
-    vertices[v].setPosition( size,  size,  size); vertices[v].setNormal(0, 0, 1); vertices[v].setTextureCoord(0, 0); v++;
-    vertices[v].setPosition( size, -size,  size); vertices[v].setNormal(0, 0, 1); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition( size,  size,  size); vertices[v].setNormal(0, 0, 1); vertices[v].setTextureCoord(1, 1); v++;
+    vertices[v].setPosition( size, -size,  size); vertices[v].setNormal(0, 0, 1); vertices[v].setTextureCoord(1, 0); v++;
     vertices[v].setPosition(-size, -size,  size); vertices[v].setNormal(0, 0, 1); vertices[v].setTextureCoord(0, 0); v++;
-    vertices[v].setPosition(-size,  size,  size); vertices[v].setNormal(0, 0, 1); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition(-size,  size,  size); vertices[v].setNormal(0, 0, 1); vertices[v].setTextureCoord(0, 1); v++;
 
     // Left face
-    vertices[v].setPosition(-size,  size,  size); vertices[v].setNormal(-1, 0, 0); vertices[v].setTextureCoord(0, 0); v++;
-    vertices[v].setPosition(-size, -size,  size); vertices[v].setNormal(-1, 0, 0); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition(-size,  size,  size); vertices[v].setNormal(-1, 0, 0); vertices[v].setTextureCoord(1, 1); v++;
+    vertices[v].setPosition(-size, -size,  size); vertices[v].setNormal(-1, 0, 0); vertices[v].setTextureCoord(0, 1); v++;
     vertices[v].setPosition(-size, -size, -size); vertices[v].setNormal(-1, 0, 0); vertices[v].setTextureCoord(0, 0); v++;
-    vertices[v].setPosition(-size,  size, -size); vertices[v].setNormal(-1, 0, 0); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition(-size,  size, -size); vertices[v].setNormal(-1, 0, 0); vertices[v].setTextureCoord(1, 0); v++;
 
     // Right face
-    vertices[v].setPosition( size,  size, -size); vertices[v].setNormal(1, 0, 0); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition( size,  size, -size); vertices[v].setNormal(1, 0, 0); vertices[v].setTextureCoord(1, 0); v++;
     vertices[v].setPosition( size, -size, -size); vertices[v].setNormal(1, 0, 0); vertices[v].setTextureCoord(0, 0); v++;
-    vertices[v].setPosition( size, -size,  size); vertices[v].setNormal(1, 0, 0); vertices[v].setTextureCoord(0, 0); v++;
-    vertices[v].setPosition( size,  size,  size); vertices[v].setNormal(1, 0, 0); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition( size, -size,  size); vertices[v].setNormal(1, 0, 0); vertices[v].setTextureCoord(0, 1); v++;
+    vertices[v].setPosition( size,  size,  size); vertices[v].setNormal(1, 0, 0); vertices[v].setTextureCoord(1, 1); v++;
 
     // Bottom face
     vertices[v].setPosition(-size, -size, -size); vertices[v].setNormal(0, -1, 0); vertices[v].setTextureCoord(0, 0); v++;
-    vertices[v].setPosition(-size, -size,  size); vertices[v].setNormal(0, -1, 0); vertices[v].setTextureCoord(0, 0); v++;
-    vertices[v].setPosition( size, -size,  size); vertices[v].setNormal(0, -1, 0); vertices[v].setTextureCoord(0, 0); v++;
-    vertices[v].setPosition( size, -size, -size); vertices[v].setNormal(0, -1, 0); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition(-size, -size,  size); vertices[v].setNormal(0, -1, 0); vertices[v].setTextureCoord(0, 1); v++;
+    vertices[v].setPosition( size, -size,  size); vertices[v].setNormal(0, -1, 0); vertices[v].setTextureCoord(1, 1); v++;
+    vertices[v].setPosition( size, -size, -size); vertices[v].setNormal(0, -1, 0); vertices[v].setTextureCoord(1, 0); v++;
 
     // Top face
-    vertices[v].setPosition( size,  size, -size); vertices[v].setNormal(0, 1, 0); vertices[v].setTextureCoord(0, 0); v++;
-    vertices[v].setPosition( size,  size,  size); vertices[v].setNormal(0, 1, 0); vertices[v].setTextureCoord(0, 0); v++;
-    vertices[v].setPosition(-size,  size,  size); vertices[v].setNormal(0, 1, 0); vertices[v].setTextureCoord(0, 0); v++;
+    vertices[v].setPosition( size,  size, -size); vertices[v].setNormal(0, 1, 0); vertices[v].setTextureCoord(1, 0); v++;
+    vertices[v].setPosition( size,  size,  size); vertices[v].setNormal(0, 1, 0); vertices[v].setTextureCoord(1, 1); v++;
+    vertices[v].setPosition(-size,  size,  size); vertices[v].setNormal(0, 1, 0); vertices[v].setTextureCoord(0, 1); v++;
     vertices[v].setPosition(-size,  size, -size); vertices[v].setNormal(0, 1, 0); vertices[v].setTextureCoord(0, 0); v++;
 
-    setColor(0, 0, 1);
+    setColor(0, 0, 0);
 /* // Color back face
     vertices[0].setColor(1, 0, 0);
     vertices[1].setColor(1, 0, 0);

@@ -88,6 +88,9 @@ public:
     void enableLighting(bool enable = true) const;
     inline void disableLighting() const { enableLighting(false); }
 
+    void enableSelectionMode(bool enable = true) const;
+    inline void disableSelectionMode() const { enableSelectionMode(false); };
+
     unsigned int getSelectionIdAt(unsigned int x, unsigned int y) const;
 
     void pushMatrix();

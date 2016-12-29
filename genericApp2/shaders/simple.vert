@@ -13,11 +13,16 @@ uniform vec4 SelectionId;
 uniform mat4 NormalModelview;
 uniform float EnableLighting;
 uniform float EnableTexturing;
+uniform float SelectionModeOn;
 
 void main(void)
 {
 ////    gl_PointSize = 5.0;
-    if (SelectionId != vec4(0,0,0,0) || EnableLighting == 0.0)
+    if (SelectionModeOn == 1.0)
+    {
+        DestinationColor = SelectionId;
+    }
+    else if (EnableLighting == 0.0)
     {
         DestinationColor = SelectionId;
     }

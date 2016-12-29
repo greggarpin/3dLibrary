@@ -91,6 +91,19 @@
             [[UIAccelerometer sharedAccelerometer] setDelegate:self];
         }
     }
+
+    // Load image for texturing
+    NSString* filename = [NSString stringWithUTF8String:"pngfile.png"];
+    NSString* path = [[NSBundle mainBundle] resourcePath];
+    NSString* fullPath = [path stringByAppendingPathComponent:filename];
+    UIImage* img = [UIImage imageWithContentsOfFile:fullPath];
+    CGImageRef cgImg = img.CGImage;
+    size_t width = CGImageGetWidth(cgImg);
+    size_t height = CGImageGetHeight(cgImg);
+    CFDataRef dataRef = CGDataProviderCopyData(CGImageGetDataProvider(cgImg));
+    m_renderingEngine->addTextureImage(CFDataGetBytePtr(dataRef), (unsigned int)width, (unsigned int)height);
+    CFRelease(dataRef);
+
     NSLog(@"Initialized");
     return self;
 }

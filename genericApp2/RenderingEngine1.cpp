@@ -34,6 +34,8 @@ public:
     void SetPitch(float rad);
     void SetYaw(float rad);
 
+    void addTextureImage(const void* image, unsigned int width, unsigned int height) {};
+
 private:
     GLuint m_framebuffer;
     GLuint m_renderbuffer;

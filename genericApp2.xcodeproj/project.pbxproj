@@ -11,6 +11,7 @@
 		C641AC3A1BD33A5600474E7B /* AccelerometerFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = C641AC391BD33A5600474E7B /* AccelerometerFilter.m */; };
 		C641AC3D1BD5C9C800474E7B /* Landscape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C641AC3C1BD5C9C800474E7B /* Landscape.cpp */; };
 		C665F9D11C19B57400E3E644 /* PositionalObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C665F9D01C19B57400E3E644 /* PositionalObject.cpp */; };
+		C68D1F521E14764500363E88 /* pngfile.png in Resources */ = {isa = PBXBuildFile; fileRef = C68D1F511E14764500363E88 /* pngfile.png */; };
 		C6A35E5E1B58435800810AB4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C6A35E5D1B58435800810AB4 /* main.m */; };
 		C6A35E611B58435800810AB4 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = C6A35E601B58435800810AB4 /* AppDelegate.mm */; };
 		C6A35E641B58435800810AB4 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = C6A35E631B58435800810AB4 /* ViewController.mm */; };
@@ -53,6 +54,7 @@
 		C665F9CF1C19B43200E3E644 /* PositionalObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PositionalObject.h; sourceTree = "<group>"; };
 		C665F9D01C19B57400E3E644 /* PositionalObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PositionalObject.cpp; sourceTree = "<group>"; };
 		C665F9D41C19B73D00E3E644 /* Stack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Stack.h; path = dataStructures/Stack.h; sourceTree = "<group>"; };
+		C68D1F511E14764500363E88 /* pngfile.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = pngfile.png; path = images/pngfile.png; sourceTree = "<group>"; };
 		C6A35E581B58435800810AB4 /* genericApp2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = genericApp2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6A35E5C1B58435800810AB4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C6A35E5D1B58435800810AB4 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -140,6 +142,7 @@
 				C665F9D41C19B73D00E3E644 /* Stack.h */,
 				C641AC381BD33A5600474E7B /* AccelerometerFilter.h */,
 				C641AC391BD33A5600474E7B /* AccelerometerFilter.m */,
+				C68D1F511E14764500363E88 /* pngfile.png */,
 				C6A35E5F1B58435800810AB4 /* AppDelegate.h */,
 				C6A35E601B58435800810AB4 /* AppDelegate.mm */,
 				C6E1D8851B73B400002AE0FA /* Cube.cpp */,
@@ -300,6 +303,7 @@
 				C6A35E691B58435800810AB4 /* Images.xcassets in Resources */,
 				C6BBDCF01B64F66100C5B817 /* simple.frag in Resources */,
 				C6BBDCF11B64F66100C5B817 /* simple.vert in Resources */,
+				C68D1F521E14764500363E88 /* pngfile.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
