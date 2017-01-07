@@ -22,6 +22,7 @@
 #include "TouchEvent.h"
 #include "Camera.h"
 #include "List.h"
+#include "Button.h"
 
 #define STRINGIFY(A) #A
 #include "shaders/Simple.vert"
@@ -99,7 +100,7 @@ private:
 
 ShaderProgram *ShaderProgram::activeProgram = NULL;
 
-class RenderingEngine2 : public IRenderingEngine {
+class RenderingEngine2 : public IRenderingEngine, public IButtonListener {
 public:
     RenderingEngine2();
     ~RenderingEngine2();
@@ -126,6 +127,8 @@ public:
 
     void addTextureImage(const void* imageBytesRGBA, unsigned int width, unsigned int height);
 
+    void onButtonPressed(Button *button) const;
+
 private:
     GLuint BuildShader(const char *source, GLenum shaderType) const;
     GLuint BuildProgram(const char *vertShader, const char *fragShader) const;
@@ -136,8 +139,8 @@ private:
     Vector GetViewDirection() const;
     void GetWorldCoordFromScreenCoord(int screenX, int screenY, float worldHeight) const;
     void RenderObject(const IRenderable &obj) const;
-    void selectPositionalObject(PositionalObject *obj);
-    void deselectPositionalObject();
+    void selectObject(IRenderable *obj);
+    void deselectObject();
     void addObject(IRenderable *obj);
     void addNewObject();
 
@@ -154,9 +157,10 @@ private:
 
     Polygon testPolygon;
 mutable    Cube testCube;
+    Button testButton;
     Cube tc[10];
     List<IRenderable *>renderableObjs;
-    PositionalObject *selectedPositionalObject;
+    IRenderable *selectedObject;
 
     TouchEventList touchList;
 };
@@ -193,7 +197,7 @@ IRenderingEngine* CreateRenderer2()
     return new RenderingEngine2();
 }
 
-RenderingEngine2::RenderingEngine2() : selectedPositionalObject(NULL)
+RenderingEngine2::RenderingEngine2() : selectedObject(NULL), testButton(-1, 1, 0.5, 0.5, "foo")
 {
     glGenFramebuffers(1, &m_framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
@@ -221,6 +225,10 @@ RenderingEngine2::RenderingEngine2() : selectedPositionalObject(NULL)
 
     testCube.SetPosition(0, 0, -2);
     testCube.SetRotation(PI/2, 0, 0);
+
+    // Renders in screen coords - [(-1, -1), (1, 1)]
+    testButton.addListener(this);
+    addObject(&testButton);
 }
 
 RenderingEngine2::~RenderingEngine2()
@@ -315,6 +323,7 @@ void RenderingEngine2::Render() const
     RenderContext::getMutableContext()->disableTexturing();
 
     RenderContext::getMutableContext()->enableLighting();
+    RenderContext::getMutableContext()->enableTransformations();
     RenderContext::getMutableContext()->applyLightColor(1, 1, 1);
     RenderContext::getMutableContext()->applyLightPosition(1, 1, 0, true);
 
@@ -439,7 +448,7 @@ void RenderingEngine2::onTouchStart(const TouchEvent &event)
 
     touchList.appendEvent(event);
 
-    deselectPositionalObject();
+    deselectObject();
 
     // Single touch, attempt to select something
     if (event.getNumPoints() == 1)
@@ -458,11 +467,18 @@ void RenderingEngine2::onTouchStart(const TouchEvent &event)
 
         if (selectedId != 0)
         {
-            IRenderable *selectedObject = IRenderable::findObjectById(selectedId);
-            selectPositionalObject(dynamic_cast<PositionalObject*>(selectedObject));
+            selectObject(IRenderable::findObjectById(selectedId));
         }
     }
 
+}
+
+void RenderingEngine2::onButtonPressed(Button *button) const
+{
+    if (button == &testButton)
+    {
+        Camera::getCamera()->resetCamera();
+    }
 }
 
 void RenderingEngine2::onTouchMoved(const TouchEvent &event)
@@ -491,12 +507,12 @@ void RenderingEngine2::onTouchMoved(const TouchEvent &event)
     // Moving a selected object
     if (event.getNumPoints() == 1)
     {
-        if (selectedPositionalObject != NULL)
+        if (dynamic_cast<PositionalObject*>(selectedObject) != NULL)
         {
             const TouchPoint &prevPoint = touchList.getPrevious()->getPoint(0);
             const TouchPoint &curPoint = event.getPoint(0);
 // TODO:: Need to project movement onto appropriate plane
-            selectedPositionalObject->MoveBy(
+            dynamic_cast<PositionalObject*>(selectedObject)->MoveBy(
                 ((float)(curPoint.getX() - prevPoint.getX()))/100.0,
                 ((float)(prevPoint.getY() - curPoint.getY()))/100.0,
                 0);
@@ -573,10 +589,10 @@ void RenderingEngine2::onTouchEnd(const TouchEvent &event)
 {
     touchList.appendEvent(event);
 
-    deselectPositionalObject();
-
     if (touchList.getNumItems() == 2)
         onTap(event.getPoint(0).getX(), event.getPoint(0).getY());
+
+    deselectObject();
 
     touchList.clear();
 }
@@ -593,21 +609,21 @@ void RenderingEngine2::onTouchEnd(int x, int y)
 {
 }
 
-void RenderingEngine2::selectPositionalObject(PositionalObject *obj)
+void RenderingEngine2::selectObject(IRenderable *obj)
 {
-    selectedPositionalObject = obj;
+    selectedObject = obj;
     Cube *c = dynamic_cast<Cube*>(obj);
     if (c != NULL)
         c->setColor(1, 0, 0);
 }
 
-void RenderingEngine2::deselectPositionalObject()
+void RenderingEngine2::deselectObject()
 {
-    Cube *c = dynamic_cast<Cube*>(selectedPositionalObject);
+    Cube *c = dynamic_cast<Cube*>(selectedObject);
     if (c != NULL)
         c->setColor(0, 0, 0);
     
-    selectedPositionalObject = NULL;
+    selectedObject = NULL;
 }
 
 void RenderingEngine2::addNewObject()
@@ -629,8 +645,19 @@ void RenderingEngine2::addNewObject()
 
 void RenderingEngine2::onTap(int x, int y)
 {
+    if (selectedObject != NULL)
+    {
+        Button *b = dynamic_cast<Button*>(selectedObject);
+        if (b != NULL)
+        {
+            b->press();
+        }
+    }
+    else
+    {
 ///    Camera::getCamera()->resetCamera();
-    addNewObject();
+        addNewObject();
+    }
 }
 
 void RenderingEngine2::SetRoll(float rad)

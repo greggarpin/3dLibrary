@@ -12,6 +12,8 @@
 		C641AC3D1BD5C9C800474E7B /* Landscape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C641AC3C1BD5C9C800474E7B /* Landscape.cpp */; };
 		C665F9D11C19B57400E3E644 /* PositionalObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C665F9D01C19B57400E3E644 /* PositionalObject.cpp */; };
 		C68D1F521E14764500363E88 /* pngfile.png in Resources */ = {isa = PBXBuildFile; fileRef = C68D1F511E14764500363E88 /* pngfile.png */; };
+		C68D1F581E215F6100363E88 /* Overlay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C68D1F561E215F6100363E88 /* Overlay.cpp */; };
+		C68D1F5B1E216A1D00363E88 /* Button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C68D1F591E216A1D00363E88 /* Button.cpp */; };
 		C6A35E5E1B58435800810AB4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C6A35E5D1B58435800810AB4 /* main.m */; };
 		C6A35E611B58435800810AB4 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = C6A35E601B58435800810AB4 /* AppDelegate.mm */; };
 		C6A35E641B58435800810AB4 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = C6A35E631B58435800810AB4 /* ViewController.mm */; };
@@ -55,6 +57,10 @@
 		C665F9D01C19B57400E3E644 /* PositionalObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PositionalObject.cpp; sourceTree = "<group>"; };
 		C665F9D41C19B73D00E3E644 /* Stack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Stack.h; path = dataStructures/Stack.h; sourceTree = "<group>"; };
 		C68D1F511E14764500363E88 /* pngfile.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = pngfile.png; path = images/pngfile.png; sourceTree = "<group>"; };
+		C68D1F561E215F6100363E88 /* Overlay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Overlay.cpp; sourceTree = "<group>"; };
+		C68D1F571E215F6100363E88 /* Overlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Overlay.h; sourceTree = "<group>"; };
+		C68D1F591E216A1D00363E88 /* Button.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Button.cpp; sourceTree = "<group>"; };
+		C68D1F5A1E216A1D00363E88 /* Button.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Button.h; sourceTree = "<group>"; };
 		C6A35E581B58435800810AB4 /* genericApp2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = genericApp2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6A35E5C1B58435800810AB4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C6A35E5D1B58435800810AB4 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -139,6 +145,8 @@
 		C6A35E5A1B58435800810AB4 /* genericApp2 */ = {
 			isa = PBXGroup;
 			children = (
+				C68D1F561E215F6100363E88 /* Overlay.cpp */,
+				C68D1F571E215F6100363E88 /* Overlay.h */,
 				C665F9D41C19B73D00E3E644 /* Stack.h */,
 				C641AC381BD33A5600474E7B /* AccelerometerFilter.h */,
 				C641AC391BD33A5600474E7B /* AccelerometerFilter.m */,
@@ -152,10 +160,10 @@
 				C665F9D01C19B57400E3E644 /* PositionalObject.cpp */,
 				C6A35E891B5847D300810AB4 /* GLView.mm */,
 				C6A35E681B58435800810AB4 /* Images.xcassets */,
+				C641AC3C1BD5C9C800474E7B /* Landscape.cpp */,
 				C6DE9D351B704CD100F5230F /* IRenderable.h */,
 				C6A35E8F1B5869CE00810AB4 /* IRenderingEngine.h */,
 				C6B2F6BC1C1D04C2009A8583 /* IRenderable.cpp */,
-				C641AC3C1BD5C9C800474E7B /* Landscape.cpp */,
 				C641AC3B1BD5C8B000474E7B /* Landscape.h */,
 				C6E1D8881B73D612002AE0FA /* Matrix.cpp */,
 				C6E1D8891B73D612002AE0FA /* Matrix.h */,
@@ -180,6 +188,8 @@
 				C6A36AC71D1D4FFE007B8A83 /* TouchEvent.cpp */,
 				C6A36AC81D1D4FFE007B8A83 /* TouchEvent.h */,
 				C6A36ACA1D1D5618007B8A83 /* List.h */,
+				C68D1F591E216A1D00363E88 /* Button.cpp */,
+				C68D1F5A1E216A1D00363E88 /* Button.h */,
 			);
 			path = genericApp2;
 			sourceTree = "<group>";
@@ -336,6 +346,8 @@
 				C6A35E8A1B5847D300810AB4 /* GLView.mm in Sources */,
 				C6A35E921B586BA200810AB4 /* RenderingEngine1.cpp in Sources */,
 				C6A35E941B596ECB00810AB4 /* RenderingEngine2.cpp in Sources */,
+				C68D1F5B1E216A1D00363E88 /* Button.cpp in Sources */,
+				C68D1F581E215F6100363E88 /* Overlay.cpp in Sources */,
 				C6B2F6BD1C1D04C2009A8583 /* IRenderable.cpp in Sources */,
 				C6DE9D381B704D0600F5230F /* RenderContext.cpp in Sources */,
 				C641AC3D1BD5C9C800474E7B /* Landscape.cpp in Sources */,

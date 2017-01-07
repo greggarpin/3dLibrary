@@ -132,6 +132,12 @@ void RenderContext::enableSelectionMode(bool enable) const
     GLint selectionToggle = glGetUniformLocation(programHandle, "SelectionModeOn");
     glUniform1f(selectionToggle, (enable ? 1.0 : 0.0));
 }
+// TODO:: Shouldn't need to fetch the uniform_locations every time
+void RenderContext::enableTransformations(bool enable) const
+{
+    GLint transformToggle = glGetUniformLocation(programHandle, "EnableTransform");
+    glUniform1f(transformToggle, (enable ? 1.0 : 0.0));
+}
 
 void RenderContext::applyProjectionMatrix()
 {

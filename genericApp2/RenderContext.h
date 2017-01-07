@@ -91,6 +91,9 @@ public:
     void enableSelectionMode(bool enable = true) const;
     inline void disableSelectionMode() const { enableSelectionMode(false); };
 
+    void enableTransformations(bool enable = true) const;
+    inline void disableTransformations() const { enableTransformations(false); };
+
     unsigned int getSelectionIdAt(unsigned int x, unsigned int y) const;
 
     void pushMatrix();
