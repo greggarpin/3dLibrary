@@ -6,6 +6,7 @@
 //  Copyright (c) 2016 Arpin, Gregg. All rights reserved.
 //
 
+#include <math.h>
 #include "TouchEvent.h"
 
 TouchPoint::TouchPoint()
@@ -121,6 +122,27 @@ const TouchEvent *TouchEventList::getPrevious() const
 {
     // TODO:: Need exception based on size
     return getAt(getNumItems() - 2);
+}
+
+bool TouchEventList::isSignificant(const TouchEvent &newEvent) const
+{
+    const TouchEvent *curr = getCurr();
+    int numCurrPoints = curr->getNumPoints();
+
+    if (newEvent.getNumPoints() != numCurrPoints)
+        return true;
+
+    for (int i = 0; i < numCurrPoints; i++) {
+
+        const TouchPoint &newPoint = newEvent.getPoint(i);
+        const TouchPoint &currPoint = curr->getPoint(i);
+
+        const unsigned int minMove = 5;
+        if (fabs(newPoint.getX() - currPoint.getX()) > minMove ||
+                fabs(newPoint.getY() - currPoint.getY()) > minMove)
+            return true;
+    }
+    return false;
 }
 
 void TouchEventList::clear()

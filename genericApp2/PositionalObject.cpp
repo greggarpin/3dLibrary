@@ -68,9 +68,9 @@ void PositionalObject::UpdateTransformMatrix()
 
     transformMatrix.makeTranslationMatrix(position.getX(), position.getY(), position.getZ());
 
-    static float xAxis[3] {1, 0, 0};
-    static float yAxis[3] {0, 1, 0};
-    static float zAxis[3] {0, 0, 1};
+    static float xAxis[3] = {1, 0, 0};
+    static float yAxis[3] = {0, 1, 0};
+    static float zAxis[3] = {0, 0, 1};
 
     m.makeRotationMatrix(xAxis, rotation.getX());
     transformMatrix.multiply(m);

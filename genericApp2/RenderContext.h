@@ -9,11 +9,16 @@
 #ifndef __genericApp2__RenderContext__
 #define __genericApp2__RenderContext__
 
+#ifdef __ANDROID__
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#else
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
+#endif // __ANDROID__
 #include "Matrix.h"
 #include "Vertex.h"
-#include "Stack.h"
+#include "datastructures/Stack.h"
 #include "TestSled.h"
 
 #define VERTEX_HANDLE_NONE -1

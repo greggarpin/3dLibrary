@@ -2,6 +2,7 @@
 #define __genericApp2__Stack__
 
 // TODO:: Should probably leverage List class
+#include <assert.h>
 #include "Util.h"
 
 template <class T> class Stack

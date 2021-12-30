@@ -15,7 +15,10 @@
 class TouchPoint
 {
 public:
-    inline TouchPoint();
+    TouchPoint()
+    {
+        set(-1, -1);
+    }
     inline TouchPoint(int xp, int yp);
 
     inline int getX() const;
@@ -56,6 +59,9 @@ public:
     inline const TouchEvent *getCurr() const;
     inline const TouchEvent *getFirst() const;
     inline const TouchEvent *getPrevious() const;
+
+    // Returns whether a given event is different from the last known event - if not, it can be ignored
+    bool isSignificant(const TouchEvent &newEvent) const;
 
     virtual void clear();
 };

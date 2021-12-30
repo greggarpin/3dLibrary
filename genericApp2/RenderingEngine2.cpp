@@ -1,13 +1,11 @@
-//
-//  RenderingEngine1.cpp
-//  genericApp2
-//
-//  Created by Arpin, Gregg on 7/16/15.
-//  Copyright (c) 2015 Arpin, Gregg. All rights reserved.
-//
-
+//#define __ANDROID__ // TODO:: This should come from a makefile
+#ifdef __ANDROID__
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#else
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
+#endif // __ANDROID__
 #include <cmath>
 #include <iostream>
 #include "IRenderingEngine.h"
@@ -16,7 +14,7 @@
 #include "Landscape.h"
 #include "RenderContext.h"
 #include "Matrix.h"
-#include "Stack.h"
+#include "dataStructures/Stack.h"
 #include "Vector.h"
 #include "Util.h"
 #include "TouchEvent.h"
@@ -485,6 +483,10 @@ void RenderingEngine2::onTouchMoved(const TouchEvent &event)
 {
     // If we haven't done a touchStart first
     if (touchList.getNumItems() < 1)
+        return;
+
+    // If we haven't moved since the \TouchStart, skip it...
+    if (touchList.getNumItems() == 1 && !touchList.isSignificant(event))
         return;
 
     // If the number of touch points has changed, start over
